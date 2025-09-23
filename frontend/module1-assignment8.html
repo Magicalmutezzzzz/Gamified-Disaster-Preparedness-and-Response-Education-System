@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 1 — Assignment 8: Field Training Upload</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    :root{
+      --bg:#07102a; --card:#0f1724; --muted:#cfe5ff;
+      --accent:#ff6b35; --success:#22c55e; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03); --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg), #021024);color:#e6f0ff}
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:20px;display:grid;grid-template-columns:1fr 380px;gap:20px}
+    .left,.right{background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{margin:0;font-size:20px;color:var(--accent)}
+    .sub{color:var(--muted);opacity:0.9;font-size:13px}
+    .upload-box{margin-top:20px;padding:20px;border:2px dashed rgba(255,255,255,0.1);border-radius:10px;text-align:center;cursor:pointer}
+    .upload-box:hover{background:rgba(255,255,255,0.02)}
+    .preview{margin-top:12px;text-align:center}
+    .preview img{max-width:100%;border-radius:8px;margin-top:10px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;margin-top:12px}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .card-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-ring{width:200px;height:200px;margin:10px auto}
+    .stats{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(rgba(2,6,23,0.5),rgba(2,6,23,0.6))}
+    .modal-inner{background:var(--card);padding:20px;border-radius:12px;width:380px;border:1px solid rgba(255,255,255,0.04);text-align:center}
+    .modal-inner h3{margin:0 0 8px 0;color:var(--accent)}
+    .modal-inner p{margin:0 0 12px 0;color:var(--muted)}
+    .close-btn{background:#fff;color:#000;border-radius:8px;padding:8px 12px;border:none;cursor:pointer}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr}.right{order:2}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <header>
+        <div>
+          <h1>Module 1 • Fire Escape</h1>
+          <div class="sub">Assignment 8 — Field Training Proof Upload</div>
+        </div>
+        <a class="btn ghost" href="module1.html">Back to Module</a>
+      </header>
+
+      <p>Please upload a photo of your <strong>on-field fire safety training</strong> (conducted with fire brigade / safety officer).  
+      This proof will grant you <strong>+20 bonus points</strong> in your module score.</p>
+
+      <label class="upload-box" for="fileInput">
+        <div>📸 Click here or drag a file to upload</div>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" />
+      </label>
+
+      <div class="preview" id="preview"></div>
+      <button class="btn" id="submitBtn">Submit Proof</button>
+    </div>
+
+    <aside class="right">
+      <div class="card-title">
+        <div><strong style="color:var(--muted)">Progress</strong><div style="font-size:12px;color:#bcd8ff">Module 1 — Fire Escape</div></div>
+        <div style="font-size:12px;color:var(--muted)">Assignment 8</div>
+      </div>
+
+      <div style="text-align:center">
+        <svg viewBox="0 0 36 36" class="progress-ring" width="200" height="200">
+          <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" stroke-width="3.5"></path>
+          <path id="progressArc" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="0 100"></path>
+          <text x="18" y="20.5" font-size="6" text-anchor="middle" fill="#fff" id="progressText">0%</text>
+        </svg>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div>Completed Assignments</div><div id="completedCount">0 / 15</div></div>
+        <div class="stat"><div>Bonus points earned</div><div id="bonusPoints">0</div></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal" id="resultModal">
+    <div class="modal-inner">
+      <h3>Proof Submitted</h3>
+      <p>Your field training photo was uploaded successfully. +20 bonus points awarded.</p>
+      <button class="close-btn" id="modalOk">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'lifesafe_module1_progress';
+    const ASSIGNMENT_NUMBER = 8;
+    const TOTAL_ASSIGNMENTS = 15;
+    const BONUS_POINTS = 20;
+
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const submitBtn = document.getElementById('submitBtn');
+    const modal = document.getElementById('resultModal');
+    const modalOk = document.getElementById('modalOk');
+    const completedCountEl = document.getElementById('completedCount');
+    const bonusPointsEl = document.getElementById('bonusPoints');
+    const progressText = document.getElementById('progressText');
+    const progressArc = document.getElementById('progressArc');
+
+    fileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = ev => {
+          preview.innerHTML = `<img src="${ev.target.result}" alt="Proof photo" />`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function loadProgress(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {completed:[], scores:{}, bonus:0} }
+      catch(e){ return {completed:[], scores:{}, bonus:0}; }
+    }
+    function saveProgress(p){ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+
+    function updateRightPanel(){
+      const p = loadProgress();
+      const done = p.completed.length;
+      completedCountEl.textContent = `${done} / ${TOTAL_ASSIGNMENTS}`;
+      bonusPointsEl.textContent = p.bonus || 0;
+      const pct = Math.round((done / TOTAL_ASSIGNMENTS) * 100);
+      progressText.textContent = pct + '%';
+      const circumference = 100;
+      const dash = (pct/100)*circumference;
+      progressArc.setAttribute('stroke-dasharray', `${dash} ${circumference - dash}`);
+    }
+
+    submitBtn.addEventListener('click', ()=>{
+      if(!fileInput.files.length){ alert('Please upload a photo before submitting.'); return; }
+
+      const state = loadProgress();
+      if(!Array.isArray(state.completed)) state.completed=[];
+      if(!state.scores) state.scores={};
+      if(!state.bonus) state.bonus=0;
+      if(!state.completed.includes(ASSIGNMENT_NUMBER)){
+        state.completed.push(ASSIGNMENT_NUMBER);
+        state.bonus += BONUS_POINTS;
+      }
+      saveProgress(state);
+
+      modal.style.display = 'flex';
+      updateRightPanel();
+    });
+
+    modalOk.addEventListener('click', ()=>{
+      modal.style.display = 'none';
+      window.location.href = 'module1.html';
+    });
+
+    updateRightPanel();
+  </script>
+</body>
+</html>

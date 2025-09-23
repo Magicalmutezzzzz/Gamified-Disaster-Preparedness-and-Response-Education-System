@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login / Register — LIFESAFE</title>
+  <meta name="description" content="Login or register for Lifesafe — gamified disaster preparedness for schools & colleges.">
+  <style>
+    :root{
+      --accent:#ff6b35;
+      --bg:#07102a;
+      --card:#0f1724;
+      --muted:#cfe5ff;
+      --maxw:960px;
+      --focus: 0 0 0 4px rgba(255,107,53,0.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#fff;background:linear-gradient(180deg,var(--bg), #051027);-webkit-font-smoothing:antialiased}
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .panel{padding:14px}
+    h2{margin:0 0 10px 0}
+    p.small{margin:6px 0 12px 0;color:var(--muted);opacity:0.9;font-size:13px}
+
+    form{display:grid;gap:10px}
+    label{font-size:13px;color:#dbeafe}
+    input,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff}
+    input::placeholder{color:rgba(255,255,255,0.5)}
+    .row{display:flex;gap:10px}
+    .half{flex:1}
+    .btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);width:auto;padding:10px 12px}
+    .hint{font-size:12px;color:#cfe5ff;opacity:0.85;margin-top:6px}
+
+    .status{padding:8px;border-radius:8px;font-size:13px;display:none}
+    .ok{background:rgba(34,197,94,0.12);color:#a7f3d0;border:1px solid rgba(34,197,94,0.12)}
+    .err{background:rgba(248,113,113,0.08);color:#fecaca;border:1px solid rgba(248,113,113,0.06)}
+
+    .google-btn{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;background:transparent}
+    .google-btn:focus{outline:none;box-shadow:var(--focus)}
+    .small-note{font-size:12px;color:#cfe5ff;opacity:0.85;margin-top:10px}
+
+    a.link{color:#cfe5ff;text-decoration:underline}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    @media (prefers-reduced-motion: reduce){ * { animation: none !important } }
+    /* focus visible for keyboard users */
+    :focus { outline: none; box-shadow: var(--focus); border-color: rgba(255,107,53,0.9); }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <header>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="font-weight:800;color:var(--accent)">LIFESAFE</div>
+        <div style="color:#cfe5ff;opacity:0.9">Disaster Preparedness</div>
+      </div>
+      <a href="index.html" class="btn btn-sm btn-ghost" style="text-decoration:none;color:inherit">Back to Launchpad</a>
+    </header>
+
+    <div class="grid" aria-live="polite">
+      <!-- Left: Register -->
+      <div class="card panel" aria-labelledby="regHeading">
+        <h2 id="regHeading">Register</h2>
+        <p class="small">Create a student account. Fields marked * are required.</p>
+
+        <form id="registerForm" autocomplete="off" novalidate>
+          <label for="studentName">Student Name *</label>
+          <input name="studentName" id="studentName" required placeholder="Full name" aria-required="true" />
+
+          <div class="row">
+            <div class="half">
+              <label for="dob">Date of Birth *</label>
+              <input name="dob" id="dob" type="date" required aria-required="true" />
+            </div>
+            <div class="half">
+              <label for="idNo">Aadhar / ID No *</label>
+              <input name="idNo" id="idNo" placeholder="1234 5678 9012" required aria-required="true" />
+            </div>
+          </div>
+
+          <label for="school">School / College *</label>
+          <input name="school" id="school" placeholder="Name of institution" required />
+
+          <div class="row">
+            <div class="half">
+              <label for="father">Father's Name</label>
+              <input name="father" id="father" placeholder="Father's name" />
+            </div>
+            <div class="half">
+              <label for="contact">Contact No *</label>
+              <input name="contact" id="contact" placeholder="+91 98xxxxxxxx" required />
+            </div>
+          </div>
+
+          <label for="emergency">Emergency Contact No *</label>
+          <input name="emergency" id="emergency" placeholder="+91 98xxxxxxxx" required />
+
+          <label for="regEmail">Email ID *</label>
+          <input name="email" id="regEmail" type="email" placeholder="student@example.com" required />
+
+          <div class="row">
+            <div class="half">
+              <label for="password">Password *</label>
+              <input name="password" id="password" type="password" placeholder="Choose a strong password" required />
+            </div>
+            <div class="half">
+              <label for="rpassword">Retype Password *</label>
+              <input name="rpassword" id="rpassword" type="password" placeholder="Retype password" required />
+            </div>
+          </div>
+
+          <div id="passMatch" class="status" aria-live="polite"></div>
+
+          <div style="display:flex;gap:10px;margin-top:6px;align-items:center">
+            <button type="submit" class="btn" id="registerBtn">Register & Save</button>
+            <button type="button" id="clearLocal" class="btn ghost">Clear Session</button>
+          </div>
+
+          <div class="hint" style="margin-top:10px">After registration you will be logged in automatically and redirected to your destination.</div>
+        </form>
+      </div>
+
+      <!-- Right: Login -->
+      <div class="card panel" aria-labelledby="loginHeading">
+        <h2 id="loginHeading">Login</h2>
+        <p class="small">Login with Google (optional) or Email & Password</p>
+
+        <!-- Google Sign-In (demo + real) -->
+        <div id="gSignWrap" style="margin-bottom:12px">
+          <div class="google-btn" id="googleBtn" role="button" tabindex="0" aria-pressed="false" title="Sign in with Google (demo)">
+            <svg width="20" height="20" viewBox="0 0 533.5 544.3" aria-hidden><path fill="#4285F4" d="M533.5 278.4c0-17.7-1.6-34.7-4.7-51.4H272v97.3h146.9c-6.3 34.1-25 62.9-53.5 82.2v68.5h86.4c50.5-46.5 80.7-115.2 80.7-196.6z"/></svg>
+            <span id="googleBtnLabel">Continue with Google (demo)</span>
+          </div>
+
+          <div style="margin-top:8px;font-size:12px;color:#cfe5ff;opacity:0.85">
+            Tip: For production enable real Google Sign-In and set GOOGLE_CLIENT_ID on the server.
+          </div>
+        </div>
+
+        <form id="loginForm" autocomplete="off" novalidate>
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="student@example.com" required />
+
+          <label for="loginPass">Password</label>
+          <input id="loginPass" type="password" placeholder="Password" required />
+
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button type="submit" class="btn" id="loginBtn">Login</button>
+            <button type="button" id="demoPopulate" class="btn ghost">Fill demo user</button>
+          </div>
+          <div id="loginStatus" class="status" aria-live="polite" style="margin-top:10px"></div>
+        </form>
+
+        <div class="small-note" style="margin-top:12px">
+          Don't have an account? Use the Register form at left. Admins can login at <a class="link" href="admin.html">/admin</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /******************************************
+     * CONFIG
+     * Change API_BASE if your Flask server runs elsewhere.
+     ******************************************/
+    const API_BASE = (function(){
+      // Attempt to auto-detect deployed origin if served from same host; otherwise edit manually.
+      // If you deploy frontend separately, replace below with your backend URL like: 'https://lifesafe-backend.onrender.com'
+      const defaultBase = 'http://127.0.0.1:5000';
+      return defaultBase;
+    })();
+
+    /******************************************
+     * Helpers
+     ******************************************/
+    function qs(name, url = window.location.href){
+      name = name.replace(/[[]]/g, "\\$&");
+      const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      const results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function showStatus(el, msg, ok=true){
+      el.style.display = 'block';
+      el.textContent = msg;
+      el.className = 'status ' + (ok ? 'ok' : 'err');
+    }
+
+    function hideStatus(el){
+      el.style.display = 'none';
+      el.textContent = '';
+      el.className = 'status';
+    }
+
+    function parseJwt(token){
+      try{
+        const payload = token.split('.')[1];
+        return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+      }catch(e){ return null; }
+    }
+    function tokenValid(token){
+      if(!token) return false;
+      const p = parseJwt(token);
+      if(!p) return true; // if no exp claim assume valid
+      if(p.exp && (Date.now()/1000) > p.exp) return false;
+      return true;
+    }
+
+    /******************************************
+     * DOM refs
+     ******************************************/
+    const registerForm = document.getElementById('registerForm');
+    const pass = document.getElementById('password');
+    const rpass = document.getElementById('rpassword');
+    const passMatch = document.getElementById('passMatch');
+    const loginForm = document.getElementById('loginForm');
+    const loginStatus = document.getElementById('loginStatus');
+
+    /******************************************
+     * Password match UI
+     ******************************************/
+    function updatePassMatch(){
+      const p = pass.value;
+      const r = rpass.value;
+      if(!p && !r){ passMatch.style.display='none'; return; }
+      passMatch.style.display='block';
+      if(p === r){
+        passMatch.textContent = 'Passwords match ✓';
+        passMatch.className = 'status ok';
+      } else {
+        passMatch.textContent = 'Passwords do not match ✖';
+        passMatch.className = 'status err';
+      }
+    }
+    pass.addEventListener('input', updatePassMatch);
+    rpass.addEventListener('input', updatePassMatch);
+
+    /******************************************
+     * API helpers (calls to Flask backend)
+     ******************************************/
+    async function apiPost(path, body, token){
+      try{
+        const headers = {'Content-Type':'application/json'};
+        if(token) headers['Authorization'] = 'Bearer ' + token;
+        const res = await fetch(API_BASE + path, { method: 'POST', headers, body: JSON.stringify(body) });
+        const data = await res.json().catch(()=>({ok:false, message:'Invalid JSON from server'}));
+        return { status: res.status, data };
+      }catch(err){
+        return { status: 0, data: { ok:false, message: 'Network error: '+err.message } };
+      }
+    }
+
+    async function apiGet(path, token){
+      try{
+        const headers = {};
+        if(token) headers['Authorization'] = 'Bearer ' + token;
+        const res = await fetch(API_BASE + path, { method: 'GET', headers });
+        const data = await res.json().catch(()=>({ok:false, message:'Invalid JSON from server'}));
+        return { status: res.status, data };
+      }catch(err){
+        return { status: 0, data: { ok:false, message: 'Network error: '+err.message } };
+      }
+    }
+
+    /******************************************
+     * Redirect helper using ?next param
+     ******************************************/
+    function redirectAfterAuth(){
+      const next = qs('next') || 'index.html';
+      window.location.href = next;
+    }
+
+    /******************************************
+     * Registration: send to backend
+     ******************************************/
+    registerForm.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const user = {
+        studentName: document.getElementById('studentName').value.trim(),
+        dob: document.getElementById('dob').value || null,
+        idNo: document.getElementById('idNo').value.trim(),
+        school: document.getElementById('school').value.trim(),
+        father: document.getElementById('father').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        emergency: document.getElementById('emergency').value.trim(),
+        email: document.getElementById('regEmail').value.trim().toLowerCase(),
+        password: pass.value
+      };
+      // Frontend validation
+      if(!user.studentName || !user.dob || !user.idNo || !user.school || !user.contact || !user.emergency || !user.email || !user.password){
+        alert('Please fill all required fields.');
+        return;
+      }
+      if(user.password !== rpass.value){
+        alert('Passwords do not match.');
+        return;
+      }
+
+      // call backend
+      const res = await apiPost('/api/register', user);
+      if(res.status === 201 && res.data && res.data.ok){
+        // store token and redirect
+        sessionStorage.setItem('lifesafe_access', res.data.access);
+        alert('Registration successful — you are now logged in.');
+        registerForm.reset();
+        passMatch.style.display = 'none';
+        redirectAfterAuth();
+        return;
+      }
+      // show error
+      const errMsg = (res.data && (res.data.message || JSON.stringify(res.data))) || 'Registration failed';
+      alert('Registration error: ' + errMsg);
+    });
+
+    /******************************************
+     * Login: call backend
+     ******************************************/
+    loginForm.addEventListener('submit', async function(e){
+      e.preventDefault();
+      hideStatus(loginStatus);
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const pwd = document.getElementById('loginPass').value;
+      if(!email || !pwd){ showStatus(loginStatus, 'Provide email and password.', false); return; }
+
+      const res = await apiPost('/api/login', { email, password: pwd });
+      if(res.status === 200 && res.data && res.data.ok){
+        sessionStorage.setItem('lifesafe_access', res.data.access);
+        showStatus(loginStatus, 'Login successful — redirecting...', true);
+        setTimeout(redirectAfterAuth, 700);
+        return;
+      }
+      const msg = (res.data && res.data.message) || 'Invalid credentials';
+      showStatus(loginStatus, msg, false);
+    });
+
+    /******************************************
+     * Demo populate: attempt login -> if fails, register demo user
+     ******************************************/
+    document.getElementById('demoPopulate').addEventListener('click', async function(){
+      const demoEmail = 'demo.student@example.com';
+      const demoPassword = 'Demo@1234';
+
+      const tryLogin = await apiPost('/api/login', { email: demoEmail, password: demoPassword });
+      if(tryLogin.status === 200 && tryLogin.data && tryLogin.data.ok){
+        sessionStorage.setItem('lifesafe_access', tryLogin.data.access);
+        alert('Demo user exists — logged in.');
+        redirectAfterAuth();
+        return;
+      }
+
+      // register demo
+      const payload = {
+        studentName: 'Demo Student',
+        dob: '2005-01-01',
+        idNo: '000000000000',
+        school: 'Demo College',
+        father: 'Demo Father',
+        contact: '+919800000000',
+        emergency: '+919800000001',
+        email: demoEmail,
+        password: demoPassword
+      };
+      const reg = await apiPost('/api/register', payload);
+      if(reg.status === 201 && reg.data && reg.data.ok){
+        sessionStorage.setItem('lifesafe_access', reg.data.access);
+        alert('Demo user created and logged in.');
+        redirectAfterAuth();
+        return;
+      }
+      alert('Demo populate failed: ' + (reg.data && (reg.data.message || JSON.stringify(reg.data))));
+    });
+
+    /******************************************
+     * Clear session
+     ******************************************/
+    document.getElementById('clearLocal').addEventListener('click', function(){
+      if(confirm('This will clear the current session token from your browser. Continue?')){
+        sessionStorage.removeItem('lifesafe_access');
+        alert('Session cleared.');
+      }
+    });
+
+    /******************************************
+     * Google sign-in (demo prompt) or real flow
+     * - Demo: prompt for email and call /api/google-signin (server will create if missing)
+     * - Real: uncomment client script & initialize google.accounts.id with your CLIENT_ID,
+     *         then call backend with the id_token you receive.
+     ******************************************/
+    document.getElementById('googleBtn').addEventListener('click', async function(){
+      // DEMO MODE (simple email prompt)
+      const email = prompt('Demo Google Sign-In — enter your Google email to simulate login:');
+      if(!email) return;
+      const res = await apiPost('/api/google-signin', { email: email.trim().toLowerCase() });
+      if(res.status === 200 && res.data && res.data.ok){
+        sessionStorage.setItem('lifesafe_access', res.data.access);
+        alert('Signed in via Google (demo). Redirecting...');
+        redirectAfterAuth();
+        return;
+      }
+      alert('Google sign-in failed: ' + (res.data && res.data.message));
+    });
+
+    /* ------------------ REAL GOOGLE SIGN-IN (optional) ------------------
+    To enable server-verified Google sign-in:
+    1) Add the Google platform script below (uncomment).
+    2) Replace GOOGLE_CLIENT_ID on your backend (env var) and ensure /api/google-signin verifies tokens.
+    3) In the callback below, send id_token to /api/google-signin:
+       const res = await apiPost('/api/google-signin', { id_token: credential });
+    --------------------------------------------------------------------- */
+
+    // Example to auto-redirect if already logged in:
+    (function(){
+      const token = sessionStorage.getItem('lifesafe_access');
+      if(token && tokenValid(token)){
+        // Do not auto-redirect to avoid surprising users — comment/uncomment as you like:
+        // redirectAfterAuth();
+      } else {
+        // clear expired token
+        if(token && !tokenValid(token)) sessionStorage.removeItem('lifesafe_access');
+      }
+    })();
+
+    // Print friendly note
+    console.log('Auth page active — backend API_BASE =', API_BASE);
+  </script>
+
+  <!-- Optional Google script (uncomment to add real client-side flow) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    window.onload = () => {
+       google.accounts.id.initialize({
+         client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+         callback: async (resp) => {
+           // resp.credential is the ID token to send to server
+           const res = await apiPost('/api/google-signin', { id_token: resp.credential });
+           if(res.status === 200 && res.data && res.data.ok){
+             sessionStorage.setItem('lifesafe_access', res.data.access);
+             redirectAfterAuth();
+           } else {
+             alert('Google sign-in failed: ' + (res.data && res.data.message));
+           }
+         }
+       });
+       // render a button if you prefer:
+       google.accounts.id.renderButton(document.getElementById('gSignWrap'), { theme: 'outline', size: 'large' });
+    };
+  </script>
+
+</body>
+</html>

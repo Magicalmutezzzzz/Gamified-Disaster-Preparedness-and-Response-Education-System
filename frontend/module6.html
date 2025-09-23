@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Module 6 — Stampede Response</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{--accent:#ff6b35;--bg:#07102a;--card:#0f1724;--muted:#cfe5ff;}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg), #051027);color:#fff;display:flex;min-height:100vh;}
+    .sidebar{width:280px;background:var(--card);padding:16px;border-right:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;}
+    .sidebar h2{margin:0 0 16px;font-size:18px;color:var(--accent)}
+    .assignments{flex:1;overflow-y:auto;}
+    .assignment{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;transition:background 0.2s;}
+    .assignment:hover{background:rgba(255,255,255,0.05)}
+    .assignment.completed{border-left:4px solid #22c55e}
+    .assignment span{font-size:13px;color:var(--muted);}
+    .main{flex:1;padding:20px;display:flex;flex-direction:column;}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    header h1{margin:0;font-size:22px;color:#fff}
+    .charts{display:flex;gap:30px;flex-wrap:wrap}
+    canvas{background:rgba(0,0,0,0.1);border-radius:10px;padding:10px}
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Assignments</h2>
+    <div class="assignments" id="assignmentsList"></div>
+  </div>
+
+  <div class="main">
+    <header>
+      <h1>Module 6: Stampede Response</h1>
+      <a href="training.html" style="color:var(--muted);font-size:14px">← Back to Training Hub</a>
+    </header>
+
+    <div class="charts">
+      <div>
+        <h3>% Completion</h3>
+        <canvas id="completionChart" width="220" height="220"></canvas>
+      </div>
+      <div>
+        <h3>Assignment Scores</h3>
+        <canvas id="scoreChart" width="220" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const TOTAL_ASSIGNMENTS = 15;
+    const STORAGE_KEY = 'lifesafe_module6_progress';
+
+    function loadProgress(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{completed:[],scores:{}}}catch(e){return{completed:[],scores:{}}}}
+    function saveProgress(p){localStorage.setItem(STORAGE_KEY, JSON.stringify(p));}
+    const progress = loadProgress();
+
+    const assignmentsList = document.getElementById('assignmentsList');
+    for(let i=1;i<=TOTAL_ASSIGNMENTS;i++){
+      let type = (i % 4 === 0) ? "Field Training Upload" : "Video + Quiz";
+      const div = document.createElement('div');
+      div.className = 'assignment';
+      if(progress.completed.includes(i)) div.classList.add('completed');
+      div.innerHTML = `<strong>Assignment ${i}</strong><br><span>${type}</span>`;
+      div.onclick = ()=>{window.location.href=`module6-assignment${i}.html`;};
+      assignmentsList.appendChild(div);
+    }
+
+    const completionCtx = document.getElementById('completionChart').getContext('2d');
+    const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+    let completionChart, scoreChart;
+
+    function updateCharts(){
+      const done = progress.completed.length;
+      if(completionChart) completionChart.destroy();
+      completionChart = new Chart(completionCtx,{type:'doughnut',data:{labels:['Completed','Remaining'],datasets:[{data:[done,TOTAL_ASSIGNMENTS-done],backgroundColor:['#22c55e','#374151']}]} ,options:{plugins:{legend:{labels:{color:'#fff'}}}}});
+      const scores = [];
+      for(let i=1;i<=TOTAL_ASSIGNMENTS;i++){scores.push(progress.scores[i]||0);}
+      if(scoreChart) scoreChart.destroy();
+      scoreChart = new Chart(scoreCtx,{type:'pie',data:{labels:scores.map((_,i)=>'A'+(i+1)),datasets:[{data:scores,backgroundColor:scores.map(s=>s>0?'#3b82f6':'#4b5563')}]} ,options:{plugins:{legend:{labels:{color:'#fff'}}}}});
+    }
+    updateCharts();
+  </script>
+</body>
+</html>

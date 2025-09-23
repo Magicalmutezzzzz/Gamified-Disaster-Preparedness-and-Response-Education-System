@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Training Ground — LIFESAFE</title>
+  <style>
+    :root{
+      --accent:#ff6b35;
+      --bg:#07102a;
+      --card:#0f1724;
+      --muted:#cfe5ff;
+      --maxw:1200px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#fff;
+      background:linear-gradient(180deg,var(--bg), #051027);
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .logo{font-weight:800;color:var(--accent);font-size:20px}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+      gap:18px;
+    }
+    .module-card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-radius:14px;
+      padding:16px;
+      border:1px solid rgba(255,255,255,0.05);
+      transition:transform .2s, box-shadow .2s;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:160px;
+    }
+    .module-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    }
+    .module-card h3{
+      margin:0 0 8px 0;
+      font-size:17px;
+      color:#fff;
+    }
+    .module-card p{
+      margin:0;
+      font-size:14px;
+      color:#cfe5ff;
+      opacity:0.9;
+    }
+    .btn{background:var(--accent);border:none;padding:8px 14px;border-radius:10px;color:#fff;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;margin-top:10px}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.1)}
+    h1{font-size:28px;margin-bottom:14px}
+    .subtitle{color:#cfe5ff;opacity:0.85;margin-bottom:24px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="logo">LIFESAFE</div>
+        <div style="color:#cfe5ff;opacity:0.9">Your Training Ground</div>
+      </div>
+      <nav>
+        <a href="index.html" class="btn ghost">Home</a>
+        <a href="auth.html" class="btn ghost" id="logoutBtn">Logout</a>
+      </nav>
+    </header>
+
+    <h1>Your Training Ground</h1>
+    <div class="subtitle">Choose a module to begin your disaster preparedness journey.</div>
+
+    <div class="grid" id="modulesGrid">
+      <!-- modules will be inserted by JS -->
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:5000';
+
+    // Example modules
+    const modules = [
+      {title:"Fire Escape", desc:"The Kitchen Fire Scenario"},
+      {title:"Earthquake Survival", desc:"The Home Evacuation Drill"},
+      {title:"Flood Readiness", desc:"The Evacuation Challenge"},
+      {title:"Cyclone Preparedness", desc:"Community Shelter Mission"},
+      {title:"Lightning Safety", desc:"Storm Protection Training"},
+      {title:"Stampede Response", desc:"Crowd Chaos Escape"},
+      {title:"First Aid Basics", desc:"Critical Life-Saving Skills"},
+      {title:"Landslide Awareness", desc:"Hill Region Evacuation"},
+      {title:"Pandemic Preparedness", desc:"Hygiene & Protocol Drill"},
+      {title:"Fire Drill Pro", desc:"Multi-floor Building Scenario"},
+    ];
+
+    const grid = document.getElementById('modulesGrid');
+    modules.forEach((m, i) => {
+      const card = document.createElement('div');
+      card.className = 'module-card';
+      card.innerHTML = `
+        <div>
+          <h3>Module ${i+1}: ${m.title}</h3>
+          <p>${m.desc}</p>
+        </div>
+        <a href="module${i+1}.html" class="btn">Start Module</a>
+      `;
+      grid.appendChild(card);
+    });
+
+    // Logout button clears token
+    document.getElementById('logoutBtn').addEventListener('click', function(e){
+      e.preventDefault();
+      sessionStorage.removeItem('lifesafe_access');
+      window.location.href = 'index.html';
+    });
+
+    /*// On load, check if logged in
+    (async function(){
+      const token = sessionStorage.getItem('lifesafe_access');
+      if(!token){
+        alert("You must login first.");
+        window.location.href = 'auth.html';
+        return;
+      }
+      // Optionally validate token with backend
+      try{
+        const r = await fetch(API_BASE + '/api/profile', {
+          headers: { 'Authorization':'Bearer ' + token }
+        });
+        if(!r.ok){
+          sessionStorage.removeItem('lifesafe_access');
+          window.location.href = 'auth.html';
+        }
+      }catch(e){
+        console.error("Profile check failed", e);
+      }
+    })();*/
+  </script>
+</body>
+</html>

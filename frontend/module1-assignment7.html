@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 1 — Assignment 7: Fire Escape (Evacuation Drills)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    :root{--bg:#07102a;--card:#0f1724;--muted:#cfe5ff;--accent:#ff6b35;--success:#22c55e;--danger:#ef4444;--glass:rgba(255,255,255,0.03);--maxw:1100px}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg), #021024);color:#e6f0ff}
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:20px;display:grid;grid-template-columns:1fr 380px;gap:20px}
+    .left,.right{background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{margin:0;font-size:20px;color:var(--accent)}.sub{color:var(--muted);opacity:0.9;font-size:13px}
+    .video-wrap{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:10px;box-shadow:0 8px 24px rgba(2,6,23,0.6)}
+    .video-embed{width:100%;height:0;padding-bottom:56.25%;position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+    .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+    .meta{margin-top:12px;background:var(--glass);padding:12px;border-radius:8px}
+    .meta h4{margin:0 0 8px 0;font-size:15px}.meta p{margin:0;font-size:13px;color:#d6e9ff;line-height:1.4}
+    form.quiz{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+    .question{background:rgba(255,255,255,0.02);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
+    .question h4{margin:0 0 8px 0;font-size:14px}
+    .options{display:grid;gap:8px}
+    .opt{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;background:transparent}
+    .opt input{transform:scale(1.05)}.opt:hover{background:rgba(255,255,255,0.02)}
+    .actions{display:flex;gap:10px;align-items:center;margin-top:10px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .note{font-size:13px;color:var(--muted)}
+    .card-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-ring{width:200px;height:200px;margin:10px auto}
+    .stats{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
+    .correct{border-left:6px solid var(--success);background:rgba(34,197,94,0.03)}
+    .incorrect{border-left:6px solid var(--danger);background:rgba(239,68,68,0.03)}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(rgba(2,6,23,0.5),rgba(2,6,23,0.6))}
+    .modal-inner{background:var(--card);padding:20px;border-radius:12px;width:380px;border:1px solid rgba(255,255,255,0.04);text-align:center}
+    .modal-inner h3{margin:0 0 8px 0;color:var(--accent)}.modal-inner p{margin:0 0 12px 0;color:var(--muted)}
+    .close-btn{background:#fff;color:#000;border-radius:8px;padding:8px 12px;border:none;cursor:pointer}
+    @media(max-width:980px){.wrap{grid-template-columns:1fr}.right{order:2}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <header>
+        <div>
+          <h1>Module 1 • Fire Escape</h1>
+          <div class="sub">Assignment 7 — Evacuation Drills</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sub">Est. time: <strong>8–10 min</strong></div>
+          <a class="btn ghost" href="module1.html">Back to Module</a>
+        </div>
+      </header>
+
+      <div class="video-wrap">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/pJ1uC7r37QY" title="Fire drills and evacuation practice"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="meta">
+          <h4>Video Description</h4>
+          <p>
+            This training shows how evacuation drills prepare people for real emergencies. It highlights assembly points, safe exits, headcounts, and the importance of calm, quick action during fire drills.
+          </p>
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Understand the purpose of regular evacuation drills.</li>
+            <li>Identify safe exit strategies and assembly points.</li>
+            <li>Practice calm and organized evacuation behavior.</li>
+          </ul>
+        </div>
+      </div>
+
+      <form class="quiz" id="quizForm"></form>
+
+      <div class="actions">
+        <button class="btn" id="submitBtn" type="button">Submit Answers</button>
+        <button class="btn ghost" id="clearBtn" type="button">Reset</button>
+      </div>
+    </div>
+
+    <aside class="right">
+      <div class="card-title">
+        <div><strong style="color:var(--muted)">Progress</strong><div style="font-size:12px;color:#bcd8ff">Module 1</div></div>
+        <div style="font-size:12px;color:var(--muted)">Assignment 7</div>
+      </div>
+      <div style="text-align:center">
+        <svg viewBox="0 0 36 36" class="progress-ring" id="progressSvg">
+          <path d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831a15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" stroke-width="3.5"></path>
+          <path id="progressArc" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831a15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="0 100"></path>
+          <text x="18" y="20.5" font-size="6" text-anchor="middle" fill="#fff" id="progressText">0%</text>
+        </svg>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Completed</span><span id="completedCount">0/15</span></div>
+        <div class="stat"><span>Last Score</span><span id="lastScore">—</span></div>
+        <div class="stat"><span>Average</span><span id="avgScore">—</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal" id="resultModal"><div class="modal-inner"><h3>Result</h3><p id="modalMsg"></p><button class="close-btn" id="modalOk">OK</button></div></div>
+
+  <script>
+    const QUESTIONS = [
+      { q:"Why are fire drills important?", options:["They waste time","They prepare people to respond safely","They are only legal requirements","They stop fires from starting"], a:1 },
+      { q:"What is the role of assembly points?", options:["Hide from fire","Gather safely for headcount","Rest during drill","Block exits"], a:1 },
+      { q:"When evacuating, you should:", options:["Run and push","Remain calm and move quickly","Collect belongings first","Take lifts"], a:1 },
+      { q:"Why is a headcount important?", options:["To check if property is safe","To ensure everyone is accounted for","To punish latecomers","To dismiss class"], a:1 },
+      { q:"Which route should you use?", options:["Nearest safe exit","Any locked door","Elevator","Roof"], a:0 },
+      { q:"During drills, alarms are used to:", options:["Scare people","Simulate real alerts","Play music","Signal end of drill"], a:1 },
+      { q:"Should you return inside during a drill?", options:["Yes, for items","No, until told it’s safe","Yes, immediately after alarm stops","Yes, if bored"], a:1 },
+      { q:"Who supervises evacuation?", options:["Teachers/wardens","Random students","No one","Police only"], a:0 },
+      { q:"What is the safest behavior in stairways?", options:["Push others","Run fast","Walk orderly on right/left side","Stop midway"], a:2 },
+      { q:"The key principle of drills is:", options:["Speed with safety","Collecting property","Waiting for leaders","Ignoring alarms"], a:0 }
+    ];
+
+    const STORAGE_KEY="lifesafe_module1_progress";const ASSIGNMENT_NUMBER=7;const TOTAL_ASSIGNMENTS=15;
+    const quizForm=document.getElementById('quizForm'),submitBtn=document.getElementById('submitBtn'),clearBtn=document.getElementById('clearBtn'),resultModal=document.getElementById('resultModal'),modalMsg=document.getElementById('modalMsg'),modalOk=document.getElementById('modalOk'),completedCountEl=document.getElementById('completedCount'),lastScoreEl=document.getElementById('lastScore'),avgScoreEl=document.getElementById('avgScore'),progressText=document.getElementById('progressText'),progressArc=document.getElementById('progressArc');
+
+    function renderQuestions(){QUESTIONS.forEach((item,i)=>{const q=document.createElement('div');q.className='question';q.innerHTML=`<h4>Q${i+1}. ${item.q}</h4><div class="options"></div>`;item.options.forEach((op,oi)=>{q.querySelector('.options').innerHTML+=`<label class='opt'><input type='radio' name='q${i}' value='${oi}'> ${op}</label>`});quizForm.appendChild(q);});}
+    function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{completed:[],scores:{}}}catch(e){return{completed:[],scores:{}}}}
+    function save(p){localStorage.setItem(STORAGE_KEY,JSON.stringify(p))}
+    function update(){const p=load();completedCountEl.textContent=`${p.completed.length}/${TOTAL_ASSIGNMENTS}`;lastScoreEl.textContent=p.scores[ASSIGNMENT_NUMBER]!==undefined?`${p.scores[ASSIGNMENT_NUMBER]}/10`:'—';const arr=Object.values(p.scores).filter(v=>typeof v==='number');avgScoreEl.textContent=arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1)+"/10":'—';const pct=Math.round((p.completed.length/TOTAL_ASSIGNMENTS)*100);progressText.textContent=pct+"%";progressArc.setAttribute('stroke-dasharray',`${pct} ${100-pct}`);}
+    function grade(){let s=0;QUESTIONS.forEach((it,i)=>{const ans=document.querySelector(`input[name='q${i}']:checked`);if(ans&&+ans.value===it.a)s++;});const st=load();if(!st.completed.includes(ASSIGNMENT_NUMBER))st.completed.push(ASSIGNMENT_NUMBER);st.scores[ASSIGNMENT_NUMBER]=s;save(st);modalMsg.textContent=`You scored ${s}/10`;resultModal.style.display='flex';update();}
+    submitBtn.onclick=()=>{grade();};clearBtn.onclick=()=>{quizForm.innerHTML='';renderQuestions();submitBtn.disabled=false;};modalOk.onclick=()=>{resultModal.style.display='none';location.href='module1.html';};
+    renderQuestions();update();
+  </script>
+</body>
+</html>
