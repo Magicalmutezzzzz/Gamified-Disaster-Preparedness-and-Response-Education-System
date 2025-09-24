@@ -7,18 +7,19 @@
   <style>
     :root{
       --accent:#ff6b35;
-      --muted:#f3f4f6;
-      --dark:#0b1221;
-      --glass: rgba(255,255,255,0.06);
-      --card: rgba(255,255,255,0.03);
+      --bg:#f9fafb;
+      --text:#1f2937;
+      --muted:#4b5563;
+      --card:#ffffff;
+      --glass: rgba(0,0,0,0.04);
       --maxw:1200px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;
-      color:#fff;
-      background:linear-gradient(180deg,#07102a 0%, #0b1221 100%);
+      color:var(--text);
+      background:var(--bg);
       -webkit-font-smoothing:antialiased;
     }
     .container{
@@ -36,7 +37,7 @@
       justify-content:center;
       overflow:hidden;
       border-radius:12px;
-      background:linear-gradient(180deg, rgba(3,6,23,0.6), rgba(3,6,23,0.6));
+      background:linear-gradient(180deg, rgba(255,255,255,0.8), rgba(249,250,251,0.95));
     }
     .hero video{
       position:absolute;
@@ -45,13 +46,13 @@
       height:100%;
       object-fit:cover;
       z-index:0;
-      filter:brightness(0.5) saturate(1.05);
+      filter:brightness(0.8) saturate(1);
     }
     .hero::after{
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));
+      background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.8));
       z-index:1;
     }
     .hero-inner{
@@ -70,12 +71,11 @@
       line-height:1.05;
       font-weight:700;
       margin:0 0 12px 0;
-      color: #fff;
+      color: var(--text);
       letter-spacing:-0.5px;
     }
     .sub{
-      color:#dce7ff;
-      opacity:0.9;
+      color:var(--muted);
       margin-bottom:20px;
       font-size:14px;
     }
@@ -98,8 +98,9 @@
       box-shadow:0 6px 18px rgba(255,107,53,0.18);
     }
     .btn.ghost{
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.12);
+      background:#fff;
+      border:1px solid #d1d5db;
+      color:var(--text);
     }
 
     /* Right card - mission summary & quick boxes */
@@ -107,8 +108,8 @@
       background:var(--card);
       padding:18px;
       border-radius:12px;
-      border:1px solid rgba(255,255,255,0.03);
-      backdrop-filter: blur(6px);
+      border:1px solid #e5e7eb;
+      box-shadow:0 2px 6px rgba(0,0,0,0.06);
     }
     .small-boxes{
       display:grid;
@@ -116,12 +117,13 @@
       gap:10px;
     }
     .small{
-      background:rgba(255,255,255,0.03);
+      background:#f9fafb;
       padding:10px;
       border-radius:8px;
       font-size:13px;
       line-height:1.2;
-      border:1px solid rgba(255,255,255,0.03);
+      border:1px solid #e5e7eb;
+      color:var(--text);
     }
 
     /* Features strip */
@@ -132,13 +134,14 @@
       margin-top:22px;
     }
     .feature{
-      background:var(--glass);
+      background:#f3f4f6;
       padding:14px;
       border-radius:10px;
       min-height:86px;
+      border:1px solid #e5e7eb;
     }
-    .feature h4{margin:0 0 6px 0;font-size:15px}
-    .feature p{margin:0;font-size:13px;color:#d9e6ff;opacity:0.9}
+    .feature h4{margin:0 0 6px 0;font-size:15px;color:var(--text)}
+    .feature p{margin:0;font-size:13px;color:var(--muted)}
 
     /* Footer quick nav */
     .nav{
@@ -181,8 +184,9 @@
     .face{
       position:absolute;width:120px;height:120px;border-radius:10px;
       display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      font-weight:700;font-size:12px;color:#fff;border:1px solid rgba(255,255,255,0.03);
+      background:linear-gradient(180deg, rgba(249,250,251,0.9), rgba(229,231,235,0.7));
+      font-weight:700;font-size:12px;color:var(--text);
+      border:1px solid #e5e7eb;
     }
     @keyframes spin{from{transform:rotateX(0deg) rotateY(0deg)} to{transform:rotateX(360deg) rotateY(360deg)}}
   </style>
@@ -193,7 +197,7 @@
     <header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
       <div style="display:flex;gap:14px;align-items:center">
         <div class="logo">LIFESAFE</div>
-        <div style="color:#c7d8ff;opacity:0.9">Gamified Disaster Preparedness</div>
+        <div style="color:var(--muted);">Gamified Disaster Preparedness</div>
       </div>
       <nav class="nav">
         <a class="btn ghost" href="auth.html">Login / Register</a>
@@ -204,9 +208,7 @@
     <section class="hero" role="region" aria-label="Launch hero">
       <!-- video - replace src with your video URL or remove -->
       <video autoplay muted loop playsinline>
-        <!-- placeholder: replace with your hosted video file or comment this block to use 3D fallback -->
         <source src="https://cdn.coverr.co/videos/coverr-students-working-on-computer-1657--1657-1080p.mp4" type="video/mp4">
-        <!-- fallback text -->
       </video>
 
       <div class="hero-inner">
@@ -252,12 +254,11 @@
             <div class="small">Upload photo → +10–20 bonus pts</div>
           </div>
 
-          <div style="margin-top:12px;font-size:13px;color:#cfe5ff;opacity:0.9">
+          <div style="margin-top:12px;font-size:13px;color:var(--muted)">
             Partners: Local Fire Dept · Disaster NGOs · Schools
           </div>
 
           <div class="animation-3d" style="margin-top:12px">
-            <!-- visual 3D cube fallback if video not supported -->
             <div class="cube" aria-hidden="true" style="position:relative">
               <div class="face" style="transform:translateZ(60px)">TRAIN</div>
               <div class="face" style="transform:rotateY(90deg) translateZ(60px)">LEARN</div>
@@ -270,7 +271,7 @@
     </section>
 
     <!-- small footer -->
-    <footer style="margin-top:18px;color:#cfe5ff;opacity:0.8;font-size:13px">
+    <footer style="margin-top:18px;color:var(--muted);font-size:13px">
       © <span id="year"></span> LIFESAFE — Built for schools & colleges
     </footer>
   </div>
@@ -278,11 +279,6 @@
   <script>
     // year
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    // If user clicks start and is not logged in, jump to auth page with ?next=mission
-    document.getElementById('startMission').addEventListener('click', function(e){
-      // allow normal navigation
-    });
   </script>
 </body>
 </html>
