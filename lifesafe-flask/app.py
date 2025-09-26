@@ -1,12 +1,12 @@
 """
 Gamified Disaster Preparedness & Response Education System Backend
+------------------------------------------------------------------
 Flask + MongoDB backend with JWT authentication and Google Sign-In.
 """
 
 import os
 import base64
 import binascii
-import logging
 from datetime import timedelta
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -18,77 +18,70 @@ from flask_jwt_extended import (
 )
 from werkzeug.utils import secure_filename
 
-# Google token verification (optional)
+# Google token verification
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 
+# ---------------------------------------------------------------------
+# Load environment variables
+# ---------------------------------------------------------------------
 load_dotenv()
-logging.basicConfig(level=logging.INFO)
 
-# ---------- ENV ----------
 MONGO_URI = os.environ.get("MONGO_URI")
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "")  # set to your frontend origin on Render
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000")
 ALLOW_INSECURE_GOOGLE = os.environ.get("ALLOW_INSECURE_GOOGLE", "0") == "1"
 
-# Basic validations (allowing insecure google for dev)
 if not MONGO_URI:
-    raise RuntimeError("MONGO_URI is required (set in environment).")
+    raise RuntimeError("MONGO_URI is required. Add it in your .env file.")
 if not JWT_SECRET_KEY:
-    raise RuntimeError("JWT_SECRET_KEY is required (set in environment).")
+    raise RuntimeError("JWT_SECRET_KEY is required. Add it in your .env file.")
 if not ADMIN_SECRET:
-    raise RuntimeError("ADMIN_SECRET is required (set in environment).")
+    raise RuntimeError("ADMIN_SECRET is required. Add it in your .env file.")
 if not GOOGLE_CLIENT_ID and not ALLOW_INSECURE_GOOGLE:
-    logging.warning("GOOGLE_CLIENT_ID not set and ALLOW_INSECURE_GOOGLE != 1; google sign-in will fail.")
+    raise RuntimeError("GOOGLE_CLIENT_ID is required unless ALLOW_INSECURE_GOOGLE=1 (dev only).")
 
-# ---------- Flask app ----------
-# adjust static_folder/static_url_path to match your repo if needed
-app = Flask(
-    __name__,
-    static_folder=os.path.join(os.path.dirname(__file__), "frontend"),  # or ../frontend if layout differs
-    static_url_path=""
-)
+#from flask_cors import CORS
 
-# CORS: allow your frontend origin and localhost dev
-allowed_origins = []
-if FRONTEND_ORIGIN:
-    allowed_origins.append(FRONTEND_ORIGIN)
-allowed_origins += ["http://localhost:3000", "http://127.0.0.1:3000"]
+# Allow both production (Render domain) and localhost for dev
+CORS(app, origins=[
+    "https://gamified-disaster-preparedness-and.onrender.com",
+    "http://localhost:3000"
+])
+# ---------------------------------------------------------------------
+# Flask app setup
+# ---------------------------------------------------------------------
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), "..", "frontend"), static_url_path="")
+CORS(app, origins=[FRONTEND_ORIGIN])   # allow frontend only
 
-# In production lock this to specific origins; for debug you can set origins="*"
-CORS(app, origins=allowed_origins or "*", supports_credentials=True)
-
-# JWT
+# JWT config
 app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=6)
 jwt = JWTManager(app)
 
-# file upload limit
+# Limit upload size (5 MB default)
 app.config["MAX_CONTENT_LENGTH"] = int(os.environ.get("MAX_UPLOAD_MB", 5)) * 1024 * 1024
 
-# ---------- MongoDB connection ----------
-try:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000)
-    # trigger a server selection to get early error if credentials/whitelist wrong
-    client.server_info()
-    db = client.get_default_database()
-    users_col = db["users"]
-    profiles_col = db["profiles"]
-    progress_col = db["module_progress"]
-    images_col = db["uploads"]
+# ---------------------------------------------------------------------
+# MongoDB setup
+# ---------------------------------------------------------------------
+client = MongoClient(MONGO_URI)
+db = client.get_default_database()
+users_col = db["users"]
+profiles_col = db["profiles"]
+progress_col = db["module_progress"]
+images_col = db["uploads"]
 
-    # indexes
-    users_col.create_index([("email", ASCENDING)], unique=True)
-    profiles_col.create_index([("idNo", ASCENDING)], unique=True, sparse=True)
-    progress_col.create_index([("user_email", ASCENDING), ("module_id", ASCENDING)], unique=True, sparse=True)
-    logging.info("Connected to MongoDB and ensured indexes.")
-except Exception as e:
-    logging.exception("Failed to connect to MongoDB. Check MONGO_URI and network/atlas whitelist.")
-    raise
+# Ensure indexes
+users_col.create_index([("email", ASCENDING)], unique=True)
+profiles_col.create_index([("idNo", ASCENDING)], unique=True, sparse=True)
+progress_col.create_index([("user_email", ASCENDING), ("module_id", ASCENDING)], unique=True, sparse=True)
 
-# ---------- helpers ----------
+# ---------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------
 def hash_password(raw: str) -> str:
     return bcrypt.hash(raw)
 
@@ -99,16 +92,16 @@ def verify_password(hash_, raw: str) -> bool:
         return False
 
 def user_public(user_doc, profile_doc=None):
-    p = profile_doc or profiles_col.find_one({"user_email": user_doc["email"]}) or {}
+    p = profile_doc or profiles_col.find_one({"user_email": user_doc["email"]})
     return {
         "email": user_doc["email"],
-        "studentName": p.get("studentName", ""),
-        "dob": p.get("dob"),
-        "idNo": p.get("idNo"),
-        "school": p.get("school", ""),
-        "father": p.get("father", ""),
-        "contact": p.get("contact", ""),
-        "emergency": p.get("emergency", ""),
+        "studentName": p.get("studentName") if p else "",
+        "dob": p.get("dob") if p else None,
+        "idNo": p.get("idNo") if p else None,
+        "school": p.get("school") if p else "",
+        "father": p.get("father") if p else "",
+        "contact": p.get("contact") if p else "",
+        "emergency": p.get("emergency") if p else "",
     }
 
 def decode_base64_image(b64str):
@@ -117,7 +110,7 @@ def decode_base64_image(b64str):
     try:
         binary = base64.b64decode(b64str, validate=True)
         return binary, None
-    except (binascii.Error, ValueError) as e:
+    except (binascii.Error, ValueError):
         return None, "Invalid base64 data"
 
 def create_user_if_missing(email):
@@ -125,35 +118,23 @@ def create_user_if_missing(email):
         users_col.insert_one({"email": email, "password_hash": None})
         profiles_col.insert_one({"user_email": email, "studentName": email.split("@")[0], "xp": 0})
 
-# ---------- static frontend ----------
+# ---------------------------------------------------------------------
+# Static routes (Frontend serving)
+# ---------------------------------------------------------------------
 @app.route("/")
 def index():
-    try:
-        return app.send_static_file("index.html")
-    except Exception:
-        return jsonify({"ok": False, "message": "Frontend not found on server."}), 404
+    return app.send_static_file("index.html")
 
 @app.route("/<path:path>")
 def static_proxy(path):
-    try:
-        return app.send_static_file(path)
-    except Exception:
-        return jsonify({"ok": False, "message": "Frontend asset not found."}), 404
+    return app.send_static_file(path)
 
-# ---------- API routes (add robust JSON error handling) ----------
-def safe_get_json():
-    try:
-        return request.get_json(force=True)
-    except Exception as e:
-        logging.exception("Invalid JSON on request")
-        return None
-
+# ---------------------------------------------------------------------
+# Auth routes
+# ---------------------------------------------------------------------
 @app.route("/api/register", methods=["POST"])
 def register():
-    data = safe_get_json()
-    if not data:
-        return jsonify({"ok": False, "message": "Invalid JSON in request"}), 400
-
+    data = request.get_json(force=True)
     required = ["studentName", "idNo", "email", "password"]
     for r in required:
         if not data.get(r):
@@ -165,30 +146,25 @@ def register():
     if data.get("idNo") and profiles_col.find_one({"idNo": data["idNo"]}):
         return jsonify({"ok": False, "message": "ID/Aadhar already registered"}), 400
 
-    try:
-        users_col.insert_one({"email": email, "password_hash": hash_password(data["password"])})
-        profiles_col.insert_one({
-            "user_email": email,
-            "studentName": data.get("studentName"),
-            "dob": data.get("dob"),
-            "idNo": data.get("idNo"),
-            "school": data.get("school"),
-            "father": data.get("father"),
-            "contact": data.get("contact"),
-            "emergency": data.get("emergency"),
-            "xp": 0
-        })
-        token = create_access_token(identity=email)
-        return jsonify({"ok": True, "message": "Registered", "access": token}), 201
-    except Exception as e:
-        logging.exception("Error creating user")
-        return jsonify({"ok": False, "message": "Server error while creating user", "detail": str(e)}), 500
+    users_col.insert_one({"email": email, "password_hash": hash_password(data["password"])})
+    profiles_col.insert_one({
+        "user_email": email,
+        "studentName": data.get("studentName"),
+        "dob": data.get("dob"),
+        "idNo": data.get("idNo"),
+        "school": data.get("school"),
+        "father": data.get("father"),
+        "contact": data.get("contact"),
+        "emergency": data.get("emergency"),
+        "xp": 0
+    })
+
+    token = create_access_token(identity=email)
+    return jsonify({"ok": True, "message": "Registered", "access": token}), 201
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    data = safe_get_json()
-    if not data:
-        return jsonify({"ok": False, "message": "Invalid JSON in request"}), 400
+    data = request.get_json(force=True)
     email = (data.get("email") or "").strip().lower()
     pwd = data.get("password") or ""
     user = users_col.find_one({"email": email})
@@ -199,15 +175,15 @@ def login():
 
 @app.route("/api/google-signin", methods=["POST"])
 def google_signin():
-    data = safe_get_json() or {}
+    data = request.get_json(force=True) or {}
     id_token_str = data.get("id_token")
     email = None
+
     if id_token_str:
         try:
             idinfo = google_id_token.verify_oauth2_token(id_token_str, google_requests.Request(), GOOGLE_CLIENT_ID)
             email = idinfo.get("email")
         except Exception as e:
-            logging.exception("Invalid Google token")
             return jsonify({"ok": False, "message": "Invalid Google token", "detail": str(e)}), 401
     elif ALLOW_INSECURE_GOOGLE:
         email = (data.get("email") or "").strip().lower()
@@ -220,7 +196,9 @@ def google_signin():
     token = create_access_token(identity=email)
     return jsonify({"ok": True, "access": token})
 
-# ---------- profile, progress, upload routes (same as your earlier code) ----------
+# ---------------------------------------------------------------------
+# Profile & Progress
+# ---------------------------------------------------------------------
 @app.route("/api/profile", methods=["GET"])
 @jwt_required()
 def profile():
@@ -249,7 +227,7 @@ def get_module_progress(module_id):
 @jwt_required()
 def save_module_progress(module_id):
     email = get_jwt_identity()
-    data = safe_get_json() or {}
+    data = request.get_json(force=True) or {}
     progress_col.update_one(
         {"user_email": email, "module_id": module_id},
         {"$set": {"completed": data.get("completed", []), "scores": data.get("scores", {})}},
@@ -261,19 +239,22 @@ def save_module_progress(module_id):
 @jwt_required()
 def upload_image(module_id):
     email = get_jwt_identity()
-    data = safe_get_json() or {}
+    data = request.get_json(force=True) or {}
     assignment = int(data.get("assignment", 0))
     filename = secure_filename(data.get("filename", "upload.jpg"))
     b64 = data.get("b64")
     if not b64:
         return jsonify({"ok": False, "message": "No image data provided"}), 400
+
     binary, err = decode_base64_image(b64)
     if not binary:
         return jsonify({"ok": False, "message": err}), 400
+
     upload_doc = {"user_email": email, "module_id": module_id, "assignment": assignment,
                   "filename": filename, "b64": b64, "size": len(binary)}
     res = images_col.insert_one(upload_doc)
     upload_id = str(res.inserted_id)
+
     progress_col.update_one(
         {"user_email": email, "module_id": module_id},
         {"$push": {"uploads": {"upload_id": upload_id, "assignment": assignment, "filename": filename}}},
@@ -281,6 +262,9 @@ def upload_image(module_id):
     )
     return jsonify({"ok": True, "upload_id": upload_id})
 
+# ---------------------------------------------------------------------
+# Admin & Health
+# ---------------------------------------------------------------------
 @app.route("/api/admin/users", methods=["GET"])
 def admin_list_users():
     secret = request.headers.get("X-Admin-Secret")
@@ -297,6 +281,9 @@ def admin_list_users():
 def health():
     return jsonify({"ok": True, "db": db.name})
 
+# ---------------------------------------------------------------------
+# Run
+# ---------------------------------------------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
