@@ -6,20 +6,19 @@
   <title>Launchpad — Disaster Preparedness (Gamified)</title>
   <style>
     :root{
-      --accent:#38607c;
-      --bg: rgba(147, 176, 205, 0.95);
-      --text:#17181a;;
-      --muted:#7f8c8d;
-      --card:#ffffff;
-      --glass:rgba(255, 255, 255, 0.6);
+      --accent:#ff6b35;
+      --muted:#f3f4f6;
+      --dark:#0b1221;
+      --glass: rgba(255,255,255,0.06);
+      --card: rgba(255,255,255,0.03);
       --maxw:1200px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;
-      color:var(--text);
-      background:var(--bg);
+      color:#fff;
+      background:linear-gradient(180deg,#07102a 0%, #0b1221 100%);
       -webkit-font-smoothing:antialiased;
     }
     .container{
@@ -37,7 +36,7 @@
       justify-content:center;
       overflow:hidden;
       border-radius:12px;
-      background:linear-gradient(180deg, rgba(9, 58, 218, 0.912), rgba(18, 119, 219, 0.95));
+      background:linear-gradient(180deg, rgba(3,6,23,0.6), rgba(3,6,23,0.6));
     }
     .hero video{
       position:absolute;
@@ -46,13 +45,13 @@
       height:100%;
       object-fit:cover;
       z-index:0;
-      filter:brightness(0.8) saturate(1);
+      filter:brightness(0.5) saturate(1.05);
     }
     .hero::after{
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.8));
+      background:linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));
       z-index:1;
     }
     .hero-inner{
@@ -71,11 +70,12 @@
       line-height:1.05;
       font-weight:700;
       margin:0 0 12px 0;
-      color: var(--text);
+      color: #fff;
       letter-spacing:-0.5px;
     }
     .sub{
-      color:var(--muted);
+      color:#dce7ff;
+      opacity:0.9;
       margin-bottom:20px;
       font-size:14px;
     }
@@ -85,7 +85,7 @@
       gap:12px;
       margin-top:10px;
       align-items:center;
-        }
+    }
     .btn{
       background:var(--accent);
       color:#fff;
@@ -95,21 +95,20 @@
       font-weight:600;
       cursor:pointer;
       text-decoration:none;
-      box-shadow:0 6px 18px rgba(226, 216, 213, 0.18);
+      box-shadow:0 6px 18px rgba(255,107,53,0.18);
     }
     .btn.ghost{
-      background:#2070a9;
-      border:1px ;
-      color:var(white);
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.12);
     }
+
     /* Right card - mission summary & quick boxes */
     .card{
       background:var(--card);
-      background-color: hwb(182 59% 11% / 0.725);
       padding:18px;
       border-radius:12px;
-      border:1px solid #1142d7;
-      box-shadow:0 2px 6px rgba(87, 7, 7, 0.06);
+      border:1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(6px);
     }
     .small-boxes{
       display:grid;
@@ -117,13 +116,12 @@
       gap:10px;
     }
     .small{
-      background:#b6c8da;
+      background:rgba(255,255,255,0.03);
       padding:10px;
       border-radius:8px;
       font-size:13px;
       line-height:1.2;
-      border:1px solid #13326e;
-      color:var(--text);
+      border:1px solid rgba(255,255,255,0.03);
     }
 
     /* Features strip */
@@ -134,14 +132,13 @@
       margin-top:22px;
     }
     .feature{
-      background:#176ba7;
+      background:var(--glass);
       padding:14px;
       border-radius:10px;
       min-height:86px;
-      border:1px solid #183673;
     }
-    .feature h4{margin:0 0 6px 0;font-size:15px;color:white}
-    .feature p{margin:0;font-size:13px;color:white}
+    .feature h4{margin:0 0 6px 0;font-size:15px}
+    .feature p{margin:0;font-size:13px;color:#d9e6ff;opacity:0.9}
 
     /* Footer quick nav */
     .nav{
@@ -150,20 +147,9 @@
       margin-top:18px;
     }
     .logo{
-        font-size: 32px;
-        font-weight: 800;
-        color: rgb(42, 236, 38); /* Vibrant green */
-        text-shadow:
-            -1px -1px 0 black,
-             1px -1px 0 black,
-            -1px  1px 0 black,
-             1px  1px 0 black,
-             3px  3px 8px rgba(0, 0, 0, 0.4); /* Soft drop shadow for depth */
-  letter-spacing: 1px;       /* Adds spacing between letters */
-  padding: 10px 20px;        /* Adds breathing room */
-  display: inline-block;     /* Keeps layout tidy */
-  border-radius: 6px;        /* Optional: rounded corners if used with background */
-}
+      font-weight:800;color:var(--accent);
+      font-size:18px;
+    }
 
     /* Responsive */
     @media (max-width:900px){
@@ -178,18 +164,14 @@
 
     /* Subtle 3D animation fallback */
     .animation-3d{
-      
-  width: 100%;
-  height: 220px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 800px;
-  margin-top: 8px;
-  background: linear-gradient(135deg, #c4c8bd, #ffffff); /* soft aqua to white */
-  box-shadow: inset 0 0 20px rgba(237, 236, 236, 0.656), 0 8px 20px rgba(0, 0, 0, 0.1); /* inner glow + outer depth */
-      ;
+      width:100%;
+      height:220px;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      perspective:800px;
+      margin-top:8px;
     }
     .cube{
       width:120px;height:120px;
@@ -199,9 +181,8 @@
     .face{
       position:absolute;width:120px;height:120px;border-radius:10px;
       display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(180deg, rgba(215, 9, 174, 0.642), rgba(212, 117, 9, 0.7));
-      font-weight:700;font-size:12px;color:var(--text);
-      border:1px solid #caa82d;
+      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      font-weight:700;font-size:12px;color:#fff;border:1px solid rgba(255,255,255,0.03);
     }
     @keyframes spin{from{transform:rotateX(0deg) rotateY(0deg)} to{transform:rotateX(360deg) rotateY(360deg)}}
   </style>
@@ -212,7 +193,7 @@
     <header style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
       <div style="display:flex;gap:14px;align-items:center">
         <div class="logo">LIFESAFE</div>
-        <div style="color:black; font-size: 22px;"><b>Gamified Disaster Preparedness</b></div>
+        <div style="color:#c7d8ff;opacity:0.9">Gamified Disaster Preparedness</div>
       </div>
       <nav class="nav">
         <a class="btn ghost" href="auth.html">Login / Register</a>
@@ -223,18 +204,20 @@
     <section class="hero" role="region" aria-label="Launch hero">
       <!-- video - replace src with your video URL or remove -->
       <video autoplay muted loop playsinline>
+        <!-- placeholder: replace with your hosted video file or comment this block to use 3D fallback -->
         <source src="https://cdn.coverr.co/videos/coverr-students-working-on-computer-1657--1657-1080p.mp4" type="video/mp4">
+        <!-- fallback text -->
       </video>
 
       <div class="hero-inner">
         <div>
-          <h1 class="headline">Train for the Unthinkable. Master Life-Saving Skills Through Gamified Experience.</h1>
+          <h1 class="headline">Train for the Unthinkable. Master Life-Saving Skills Through Play.</h1>
           <p class="sub">
             We transform critical disaster preparedness into an engaging, interactive training experience — video missions, quizzes, and real-world drills.
           </p>
 
           <div class="cta">
-            <a class="btn ghost" href="auth.html" id="startMission">Start Your First Mission!</a>
+            <a class="btn" href="auth.html" id="startMission">Start Your First Mission!</a>
             <a class="btn ghost" href="#how">How it Works</a>
           </div>
 
@@ -261,19 +244,20 @@
         <aside class="card" aria-hidden="false">
           <h3 style="margin-top:0">Quick Mission Brief</h3>
           <div class="small-boxes" role="list">
-            <div class="small"><b>Register with school details</b></div>
-            <div class="small"><b>Choose a disaster mission</b></div>
-            <div class="small"><b>Watch lesson (5–8 min)</b></div>
-            <div class="small"><b>Take the quiz & earn XP</b></div>
-            <div class="small"><b>Attend Saturday practical</b></div>
-            <div class="small"><b>Upload photo → +10–20 bonus pts</b></div>
+            <div class="small">Register with school details</div>
+            <div class="small">Choose a disaster mission</div>
+            <div class="small">Watch lesson (5–8 min)</div>
+            <div class="small">Take the quiz & earn XP</div>
+            <div class="small">Attend Saturday practical</div>
+            <div class="small">Upload photo → +10–20 bonus pts</div>
           </div>
 
-          <div style="margin-top:12px;font-size:13px;color:var(--muted)">
-            Partners: Local Fire Dept · Disaster NGOs · Schools · colleges
+          <div style="margin-top:12px;font-size:13px;color:#cfe5ff;opacity:0.9">
+            Partners: Local Fire Dept · Disaster NGOs · Schools
           </div>
 
           <div class="animation-3d" style="margin-top:12px">
+            <!-- visual 3D cube fallback if video not supported -->
             <div class="cube" aria-hidden="true" style="position:relative">
               <div class="face" style="transform:translateZ(60px)">TRAIN</div>
               <div class="face" style="transform:rotateY(90deg) translateZ(60px)">LEARN</div>
@@ -286,14 +270,19 @@
     </section>
 
     <!-- small footer -->
-    <footer style="margin-top:18px;color:var(--muted);font-size:13px">
-      ©️ <span id="year"></span> LIFESAFE — Built for schools & colleges
+    <footer style="margin-top:18px;color:#cfe5ff;opacity:0.8;font-size:13px">
+      © <span id="year"></span> LIFESAFE — Built for schools & colleges
     </footer>
   </div>
 
   <script>
     // year
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // If user clicks start and is not logged in, jump to auth page with ?next=mission
+    document.getElementById('startMission').addEventListener('click', function(e){
+      // allow normal navigation
+    });
   </script>
 </body>
 </html>
