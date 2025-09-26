@@ -177,23 +177,13 @@ def create_user_if_missing(email):
         profiles_col.insert_one({"user_email": email, "studentName": email.split("@")[0], "xp": 0})
 
 # -----------------------
-# Static frontend routes
-# -----------------------
 @app.route("/")
 def index():
-    # If static frontend exists, serve index.html otherwise return JSON helpful message
-    if app.static_folder and (Path(app.static_folder) / "index.html").exists():
-        return send_from_directory(app.static_folder, "index.html")
-    return jsonify({"ok": False, "message": "Frontend not found on server."}), 404
+    return app.send_static_file("index.html")
 
 @app.route("/<path:path>")
 def static_proxy(path):
-    if app.static_folder and (Path(app.static_folder) / path).exists():
-        return send_from_directory(app.static_folder, path)
-    # fallback to index.html for SPA routes if available
-    if app.static_folder and (Path(app.static_folder) / "index.html").exists():
-        return send_from_directory(app.static_folder, "index.html")
-    return jsonify({"ok": False, "message": "Frontend resource not found.", "path": path}), 404
+    return app.send_static_file(path)
 
 # -----------------------
 # Auth routes
