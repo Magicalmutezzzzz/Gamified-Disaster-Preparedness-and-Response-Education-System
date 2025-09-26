@@ -179,11 +179,24 @@
       animation:spin 8s linear infinite;
     }
     .face{
-      position:absolute;width:120px;height:120px;border-radius:10px;
-      display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      font-weight:700;font-size:12px;color:#fff;border:1px solid rgba(255,255,255,0.03);
-    }
+      
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d25427, #ff7e4d); /* warm gradient */
+  font-weight: 700;
+  font-size: 14px;
+  color: #f6f4f0;
+  border: 1px solid rgba(99, 210, 15, 0.08); /* slightly stronger border */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* soft depth */
+  text-transform: uppercase; /* optional: bold look */
+  letter-spacing: 1px; /* optional: spacing for clarity */
+}
+
     @keyframes spin{from{transform:rotateX(0deg) rotateY(0deg)} to{transform:rotateX(360deg) rotateY(360deg)}}
   </style>
 </head>
@@ -271,7 +284,7 @@
 
     <!-- small footer -->
     <footer style="margin-top:18px;color:#cfe5ff;opacity:0.8;font-size:13px">
-      © <span id="year"></span> LIFESAFE — Built for schools & colleges
+      ©️ <span id="year"></span> LIFESAFE — Built for schools & colleges
     </footer>
   </div>
 
