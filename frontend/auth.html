@@ -159,15 +159,7 @@
      ******************************************/
     // If your frontend and backend are served from the same origin (Render), we use location.origin.
     // If backend is deployed separately, replace with full URL: e.g., 'https://your-backend.onrender.com'
-    const API_BASE = (function(){
-      // If running locally (file:/// or http://localhost), change this to backend URL manually.
-      try {
-        const host = window.location.origin;
-        return host; // assume backend is same origin, e.g. https://gamified-disaster-preparedness-and.onrender.com
-      } catch(e){
-        return 'http://127.0.0.1:5000';
-      }
-    })();
+    const API_BASE = "https://gamified-disaster-preparedness-and.onrender.com";
 
     // Google client id (must match backend GOOGLE_CLIENT_ID env and Authorized JS origins)
     const GOOGLE_CLIENT_ID = '299186708270-r8aa0errs6ph78ktk3672blvj1i4uvut.apps.googleusercontent.com';
