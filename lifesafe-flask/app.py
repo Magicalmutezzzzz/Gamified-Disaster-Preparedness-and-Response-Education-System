@@ -3,10 +3,7 @@
 app.py
 Single-file Flask backend for Gamified Disaster Preparedness & Response Education System.
 
-Usage:
- - Set environment variables (see deploy notes)
- - python app.py
- - Deploy to Render or any hosting that supports Python/Flask
+Note: set environment variables (MONGO_URI, JWT_SECRET_KEY, ADMIN_SECRET, etc.)
 """
 
 import os
@@ -19,11 +16,11 @@ from pymongo import MongoClient, ASCENDING
 from passlib.hash import bcrypt
 from dotenv import load_dotenv
 from flask_jwt_extended import (
-    JWTManager, create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request_optional
+    JWTManager, create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
 )
 from werkzeug.utils import secure_filename
 
-# Optional Google verification (only if GOOGLE_CLIENT_ID provided)
+# Optional Google verification libs
 try:
     from google.oauth2 import id_token as google_id_token
     from google.auth.transport import requests as google_requests
@@ -31,35 +28,35 @@ try:
 except Exception:
     GOOGLE_LIBS_AVAILABLE = False
 
-# Load .env (if present)
+# Load .env if present
 load_dotenv()
 
 # ---------------------------
-# Required environment vars
+# Environment variables
 # ---------------------------
 MONGO_URI = os.environ.get("MONGO_URI")
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET")
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")  # optional (recommended)
-FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "*")  # set to your frontend URL on production
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "*")
 ALLOW_INSECURE_GOOGLE = os.environ.get("ALLOW_INSECURE_GOOGLE", "0") == "1"
 
-# Basic validations
 if not MONGO_URI:
     raise RuntimeError("MONGO_URI is required in environment")
 if not JWT_SECRET_KEY:
     raise RuntimeError("JWT_SECRET_KEY is required in environment")
 if not ADMIN_SECRET:
     raise RuntimeError("ADMIN_SECRET is required in environment")
-if GOOGLE_CLIENT_ID is None and not ALLOW_INSECURE_GOOGLE:
-    # It's okay to run without Google; only required if you want Google sign-in verification.
-    pass
 
 # ---------------------------
 # Flask app
 # ---------------------------
 app = Flask(__name__, static_folder="frontend", static_url_path="/")
-CORS(app, origins=[FRONTEND_ORIGIN] if FRONTEND_ORIGIN != "*" else None)
+# allow wildcard or single origin
+if FRONTEND_ORIGIN == "*" or FRONTEND_ORIGIN == "":
+    CORS(app)
+else:
+    CORS(app, resources={r"/*": {"origins": FRONTEND_ORIGIN}})
 
 app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=6)
@@ -79,11 +76,11 @@ progress_col = db["module_progress"]
 images_col = db["uploads"]
 modules_col = db["modules"]
 
-# Indexes
+# Ensure indexes
 users_col.create_index([("email", ASCENDING)], unique=True)
 profiles_col.create_index([("idNo", ASCENDING)], unique=True, sparse=True)
 progress_col.create_index([("user_email", ASCENDING), ("module_id", ASCENDING)], unique=True, sparse=True)
-modules_col.create_index([("module_id", ASCENDING)], unique=True)
+modules_col.create_index([("module_id", ASCENDING)], unique=True, sparse=True)
 
 # ---------------------------
 # Helpers
@@ -121,7 +118,7 @@ def decode_base64_image(b64str):
     try:
         binary = base64.b64decode(b64str, validate=True)
         return binary, None
-    except (binascii.Error, ValueError) as e:
+    except (binascii.Error, ValueError):
         return None, "Invalid base64 data"
 
 def create_user_if_missing(email):
@@ -132,7 +129,6 @@ def create_user_if_missing(email):
         users_col.insert_one({"email": email, "password_hash": None})
         profiles_col.insert_one({"user_email": email, "studentName": email.split("@")[0], "xp": 0})
 
-# strip answers from quiz before sending to client
 def sanitize_quiz_for_client(assignment_doc):
     doc = dict(assignment_doc)
     if doc.get("type") == "quiz" and isinstance(doc.get("quiz"), dict):
@@ -160,7 +156,6 @@ def grade_quiz(assignment_doc, answers):
         elif isinstance(answers, (list, tuple)):
             if i < len(answers):
                 submitted = answers[i]
-        # normalize types
         try:
             ok = (submitted is not None and int(submitted) == int(correct))
         except Exception:
@@ -171,11 +166,10 @@ def grade_quiz(assignment_doc, answers):
     return {"score": score, "total": total, "detail": detail}
 
 # ---------------------------
-# Static routes (optional)
+# Static routes
 # ---------------------------
 @app.route("/")
 def index():
-    # If you have frontend static files in ./frontend, this serves them.
     try:
         return app.send_static_file("index.html")
     except Exception:
@@ -189,7 +183,7 @@ def static_proxy(p):
         return jsonify({"ok": False, "message": "Not found"}), 404
 
 # ---------------------------
-# Auth routes
+# Auth
 # ---------------------------
 @app.route("/api/register", methods=["POST"])
 def register():
@@ -256,7 +250,7 @@ def google_signin():
     return jsonify({"ok": True, "access": token})
 
 # ---------------------------
-# Profile & progress endpoints
+# Profile & progress
 # ---------------------------
 @app.route("/api/profile", methods=["GET"])
 @jwt_required()
@@ -295,7 +289,7 @@ def save_module_progress(module_id):
     return jsonify({"ok": True, "message": "Progress saved"})
 
 # ---------------------------
-# Module content endpoints (public)
+# Module content (public)
 # ---------------------------
 @app.route("/api/modules", methods=["GET"])
 def list_modules():
@@ -315,11 +309,19 @@ def get_module(module_id):
     m["assignments"] = [sanitize_quiz_for_client(a) for a in m.get("assignments", [])]
     return jsonify({"ok": True, "module": m})
 
-# allow optional JWT for viewing assignment (frontend may pass token)
 @app.route("/api/module/<int:module_id>/assignment/<int:assignment_no>", methods=["GET"])
 def get_assignment(module_id, assignment_no):
-    # optional token — don't require auth to view questions
-    verify_jwt_in_request_optional()
+    # allow optional JWT
+    try:
+        verify_jwt_in_request(optional=True)
+    except TypeError:
+        try:
+            verify_jwt_in_request()
+        except Exception:
+            pass
+    except Exception:
+        pass
+
     m = modules_col.find_one({"module_id": module_id}, {"_id": 0})
     if not m:
         return jsonify({"ok": False, "message": "Module not found"}), 404
@@ -355,7 +357,6 @@ def submit_assignment(module_id, assignment_no):
     score = int(result["score"])
     total = int(result["total"])
 
-    # update progress
     prog = progress_col.find_one({"user_email": email, "module_id": module_id}) or {"user_email": email, "module_id": module_id, "completed": [], "scores": {}, "uploads": []}
     completed = set(prog.get("completed", []))
     completed.add(assignment_no)
@@ -363,13 +364,12 @@ def submit_assignment(module_id, assignment_no):
     scores[str(assignment_no)] = score
     progress_col.update_one({"user_email": email, "module_id": module_id}, {"$set": {"completed": list(completed), "scores": scores}}, upsert=True)
 
-    # optional xp award (1 xp per correct answer)
     profiles_col.update_one({"user_email": email}, {"$inc": {"xp": score}}, upsert=True)
 
     return jsonify({"ok": True, "result": result, "score": score, "total": total})
 
 # ---------------------------
-# Upload (image) endpoint for assignments of type "upload"
+# Upload (image) for assignments
 # ---------------------------
 @app.route("/api/module/<int:module_id>/upload", methods=["POST"])
 @jwt_required()
@@ -399,7 +399,7 @@ def upload_image(module_id):
     return jsonify({"ok": True, "upload_id": upload_id})
 
 # ---------------------------
-# Admin: list users & bootstrap modules
+# Admin: users & bootstrap
 # ---------------------------
 @app.route("/api/admin/users", methods=["GET"])
 def admin_list_users():
@@ -435,7 +435,6 @@ def admin_bootstrap():
             module_id = int(m["module_id"])
             m["module_id"] = module_id
             m["assignments"] = m.get("assignments", [])
-            # normalize assignments
             for a in m["assignments"]:
                 a["assignment"] = int(a.get("assignment", 0))
                 a["type"] = a.get("type", "quiz")
