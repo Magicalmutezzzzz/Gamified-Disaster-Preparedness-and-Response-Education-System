@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 2 — Assignment 8: Earthquake Field Training Upload</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    :root{
+      --bg:#07102a; --card:#0f1724; --muted:#cfe5ff;
+      --accent:#ff6b35; --success:#22c55e; --danger:#ef4444;
+      --maxw:900px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg), #021024);color:#e6f0ff;}
+    .wrap{max-width:var(--maxw);margin:40px auto;padding:20px}
+    .card{background:var(--card);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.05)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    h1{margin:0;font-size:20px;color:var(--accent)}
+    .sub{color:var(--muted);font-size:14px}
+    .upload-box{text-align:center;padding:30px;border:2px dashed rgba(255,255,255,0.1);border-radius:12px}
+    input[type=file]{margin:15px 0;color:#fff}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer}
+    .status{margin-top:12px;font-size:14px;display:none}
+    .ok{color:var(--success)} .err{color:var(--danger)}
+    .progress{margin-top:20px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px}
+    .stat{display:flex;justify-content:space-between;margin-bottom:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div>
+          <h1>Module 2 • Earthquake</h1>
+          <div class="sub">Assignment 8 — Field Training Upload</div>
+        </div>
+        <a href="module2.html" class="btn" style="text-decoration:none;background:transparent;border:1px solid rgba(255,255,255,0.2);">← Back</a>
+      </header>
+
+      <p style="font-size:15px;line-height:1.5;color:var(--muted)">
+        Perform the earthquake safety drill with your family/class and upload a photo as proof. 
+        Your upload will be recorded and shown in your progress.
+      </p>
+
+      <div class="upload-box">
+        <p>📤 Upload proof image (JPG/PNG, max 5MB)</p>
+        <input type="file" id="fileInput" accept="image/*" />
+        <br>
+        <button class="btn" id="uploadBtn">Upload</button>
+        <div id="uploadStatus" class="status"></div>
+      </div>
+
+      <div class="progress">
+        <div class="stat"><span>Completed Assignments</span><span id="completedCount">0 / 15</span></div>
+        <div class="stat"><span>Last Upload</span><span id="lastUpload">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MODULE_ID = 2;
+    const ASSIGNMENT_NUMBER = 8;
+    const TOTAL_ASSIGNMENTS = 15;
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const completedCountEl = document.getElementById('completedCount');
+    const lastUploadEl = document.getElementById('lastUpload');
+
+    function getToken(){ return sessionStorage.getItem('lifesafe_access'); }
+
+    async function apiFetch(path, method='GET', body=null){
+      const headers = {}; const token = getToken();
+      if(token) headers['Authorization'] = 'Bearer ' + token;
+      const opts = { method, headers };
+      if(body){ headers['Content-Type']='application/json'; opts.body = JSON.stringify(body); }
+      try{
+        const res = await fetch(window.location.origin + path, opts);
+        const data = await res.json().catch(()=>({ok:false}));
+        return {status:res.status,data};
+      }catch(err){ return {status:0,data:{ok:false,message:err.message}} }
+    }
+
+    async function loadProgress(){
+      const res = await apiFetch(`/api/module/${MODULE_ID}/progress`);
+      if(res.data && res.data.ok){
+        const done = (res.data.completed||[]).length;
+        completedCountEl.textContent = `${done} / ${TOTAL_ASSIGNMENTS}`;
+        const uploads = res.data.uploads||[];
+        if(uploads.length){ lastUploadEl.textContent = uploads[uploads.length-1].filename; }
+      }
+    }
+
+    uploadBtn.addEventListener('click', async ()=>{
+      const file = fileInput.files[0];
+      if(!file){ alert('Please select a file'); return; }
+      const reader = new FileReader();
+      reader.onload = async ()=>{
+        const b64 = reader.result;
+        const res = await apiFetch(`/api/module/${MODULE_ID}/upload`,'POST',{
+          assignment: ASSIGNMENT_NUMBER,
+          filename: file.name,
+          b64
+        });
+        if(res.data && res.data.ok){
+          uploadStatus.style.display='block';
+          uploadStatus.className='status ok';
+          uploadStatus.textContent='✅ Upload successful';
+          await loadProgress();
+        }else{
+          uploadStatus.style.display='block';
+          uploadStatus.className='status err';
+          uploadStatus.textContent='❌ Upload failed: '+(res.data.message||'');
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    loadProgress();
+  </script>
+</body>
+</html>

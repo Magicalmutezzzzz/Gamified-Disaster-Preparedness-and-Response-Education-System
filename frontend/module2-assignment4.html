@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 2 — Assignment 4: Earthquake Drill (Upload)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+    :root{
+      --bg:#07102a;
+      --card:#0f1724;
+      --muted:#cfe5ff;
+      --accent:#ff6b35;
+      --success:#22c55e;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03);
+      --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg), #021024);
+      color:#e6f0ff;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{
+      max-width:var(--maxw);
+      margin:28px auto;
+      padding:20px;
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap:20px;
+    }
+    .left,.right{background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{margin:0;font-size:20px;color:var(--accent)}
+    .sub{color:var(--muted);opacity:0.9;font-size:13px}
+
+    .instructions{background:var(--glass);padding:12px;border-radius:8px;margin-bottom:16px}
+    .instructions h4{margin:0 0 8px;font-size:15px}
+    .instructions p{margin:0;font-size:13px;color:#d6e9ff;line-height:1.4}
+
+    form.upload-form{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+    input[type="file"]{padding:10px;border-radius:8px;background:#fff;color:#000}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .status{font-size:13px;margin-top:6px;display:none;padding:8px;border-radius:8px}
+    .ok{background:rgba(34,197,94,0.12);color:#16a34a}
+    .err{background:rgba(239,68,68,0.12);color:#dc2626}
+
+    .card-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-ring{width:200px;height:200px;margin:10px auto}
+    .stats{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
+
+    @media(max-width:980px){.wrap{grid-template-columns:1fr}.right{order:2}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <header>
+        <div>
+          <h1>Module 2 • Earthquake</h1>
+          <div class="sub">Assignment 4 — Earthquake Drill (Photo Upload)</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sub">Est. time: <strong>5–7 min</strong></div>
+          <a class="btn ghost" href="module2.html">Back to Module</a>
+        </div>
+      </header>
+
+      <div class="instructions">
+        <h4>Assignment Task</h4>
+        <p>
+          Perform a simple <strong>earthquake safety drill</strong> at your home or school.  
+          Practice <em>Drop, Cover, and Hold On</em> under a sturdy desk, or stand safely near a wall corner.  
+          Upload a clear <strong>photo proof</strong> of your practice drill.
+        </p>
+      </div>
+
+      <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
+        <input type="file" id="fileInput" accept="image/*" required />
+        <button type="submit" class="btn">Upload Proof</button>
+        <div id="uploadStatus" class="status"></div>
+      </form>
+    </div>
+
+    <aside class="right">
+      <div class="card-title">
+        <div><strong style="color:var(--muted)">Progress</strong><div style="font-size:12px;color:#bcd8ff">Module 2 — Earthquake</div></div>
+        <div style="font-size:12px;color:var(--muted)">Assignment 4</div>
+      </div>
+      <div style="text-align:center">
+        <svg viewBox="0 0 36 36" class="progress-ring" id="progressSvg" width="200" height="200">
+          <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none" stroke="#374151" stroke-width="3.5"></path>
+          <path id="progressArc" d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="0 100"></path>
+          <text x="18" y="20.5" font-size="6" text-anchor="middle" fill="#fff" id="progressText">0%</text>
+        </svg>
+      </div>
+      <div class="stats">
+        <div class="stat"><div>Completed Assignments</div><div id="completedCount">0 / 15</div></div>
+        <div class="stat"><div>Last Upload</div><div id="lastUpload">—</div></div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const MODULE_ID = 2, ASSIGNMENT_NUMBER = 4, TOTAL_ASSIGNMENTS = 15;
+    const uploadForm=document.getElementById('uploadForm'),fileInput=document.getElementById('fileInput'),uploadStatus=document.getElementById('uploadStatus');
+    const completedCountEl=document.getElementById('completedCount'),lastUploadEl=document.getElementById('lastUpload'),progressText=document.getElementById('progressText'),progressArc=document.getElementById('progressArc');
+
+    function getToken(){return sessionStorage.getItem('lifesafe_access');}
+    async function apiFetch(path,method='GET',body=null){
+      const headers={'Content-Type':'application/json'};
+      const token=getToken();if(token) headers['Authorization']='Bearer '+token;
+      const opts={method,headers};if(body) opts.body=JSON.stringify(body);
+      const res=await fetch(window.location.origin+path,opts);const data=await res.json().catch(()=>({ok:false}));return {status:res.status,data};}
+
+    async function loadProgress(){const r=await apiFetch(`/api/module/${MODULE_ID}/progress`);return r.data||{completed:[],uploads:[]};}
+    async function updateRightPanel(){const p=await loadProgress();const done=(p.completed||[]).length;completedCountEl.textContent=`${done} / ${TOTAL_ASSIGNMENTS}`;const last=(p.uploads&&p.uploads.length)?p.uploads[p.uploads.length-1].filename:'—';lastUploadEl.textContent=last;const pct=Math.round((done/TOTAL_ASSIGNMENTS)*100);progressText.textContent=pct+'%';const circ=100;const dash=(pct/100)*circ;progressArc.setAttribute('stroke-dasharray',`${dash} ${circ-dash}`);}
+
+    function showStatus(msg,ok=true){uploadStatus.style.display='block';uploadStatus.textContent=msg;uploadStatus.className='status '+(ok?'ok':'err');}
+
+    uploadForm.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const file=fileInput.files[0];if(!file){showStatus('Please select an image',false);return;}
+      const reader=new FileReader();
+      reader.onload=async()=>{const b64=reader.result;const res=await apiFetch(`/api/module/${MODULE_ID}/upload`,'POST',{assignment:ASSIGNMENT_NUMBER,filename:file.name,b64});if(res.data&&res.data.ok){showStatus('Upload successful ✓',true);await updateRightPanel();}else{showStatus('Upload failed: '+(res.data.message||'Error'),false);}};
+      reader.readAsDataURL(file);
+    });
+
+    (async()=>{await updateRightPanel();})();
+  </script>
+</body>
+</html>

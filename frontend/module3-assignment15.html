@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 2 — Assignment 15: Field Photo Upload</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    :root{
+      --bg:#07102a; --card:#0f1724; --muted:#cfe5ff;
+      --accent:#ff6b35; --success:#22c55e; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03); --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg), #021024);color:#e6f0ff;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:20px;display:grid;grid-template-columns:1fr 380px;gap:20px}
+    .left,.right{background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{margin:0;font-size:20px;color:var(--accent)}
+    .sub{color:var(--muted);font-size:13px}
+    .uploader{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:16px;border-radius:10px}
+    label{display:block;margin-bottom:6px;color:#d6e9ff}
+    input[type=file]{display:block}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .hint{font-size:13px;color:var(--muted);margin-top:8px}
+    .preview{margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);padding:8px;display:flex;gap:12px;align-items:center}
+    .preview img{height:120px;max-width:180px;object-fit:cover;border-radius:6px}
+    .upload-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .upload-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .small{font-size:13px;color:var(--muted)}
+    .stat{display:flex;justify-content:space-between;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px;margin-top:8px}
+    .progress-ring{width:200px;height:200px;margin:10px auto}
+    .err{color:var(--danger)}
+    @media(max-width:980px){.wrap{grid-template-columns:1fr}.right{order:2}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <header>
+        <div>
+          <h1>Module 2 • Earthquake</h1>
+          <div class="sub">Assignment 15 — Field Photo Upload</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sub">Final field assignment — upload proof</div>
+          <a class="btn ghost" href="module2.html" style="margin-top:8px;display:inline-block">Back to Module</a>
+        </div>
+      </header>
+
+      <div class="uploader" role="region" aria-label="Upload photo proof">
+        <p class="small">Upload your field evidence photo. Max <strong id="maxMbText">5 MB</strong>.</p>
+
+        <label for="photoFile">Select photo (jpg/png)</label>
+        <input id="photoFile" type="file" accept="image/*" />
+
+        <label for="photoNote">Optional note</label>
+        <input id="photoNote" type="text" placeholder="Short description" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff" />
+
+        <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+          <button class="btn" id="uploadBtn" type="button">Upload Photo</button>
+          <button class="btn ghost" id="clearBtn" type="button">Clear</button>
+          <div id="status" class="small" style="margin-left:8px;display:inline-block"></div>
+        </div>
+
+        <div id="localPreview" class="preview" style="display:none">
+          <img id="previewImg" src="" alt="Preview" />
+          <div style="flex:1">
+            <div id="previewName" class="small"></div>
+            <div id="previewSize" class="small" style="margin-top:6px"></div>
+            <div id="previewNote" class="small" style="margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong class="small">Previously uploaded for this assignment</strong>
+          <div id="previousUploads" class="upload-list small"></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="right" aria-label="Progress & Stats">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><strong style="color:var(--muted)">Progress</strong><div style="font-size:12px;color:#bcd8ff">Module 2 — Earthquake</div></div>
+        <div style="font-size:12px;color:var(--muted)">Assignment 15</div>
+      </div>
+
+      <div style="text-align:center">
+        <svg viewBox="0 0 36 36" class="progress-ring" id="progressSvg" aria-hidden>
+          <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" stroke-width="3.5"></path>
+          <path id="progressArc" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="0 100"></path>
+          <text x="18" y="20.5" font-size="6" text-anchor="middle" fill="#fff" id="progressText">0%</text>
+        </svg>
+      </div>
+
+      <div class="stats" style="margin-top:6px">
+        <div class="stat"><div style="font-size:14px">Completed Assignments</div><div id="completedCount">0 / 15</div></div>
+        <div class="stat"><div style="font-size:14px">Your last score</div><div id="lastScore">—</div></div>
+        <div class="stat"><div style="font-size:14px">Module Avg.</div><div id="avgScore">—</div></div>
+      </div>
+
+      <div class="hint" style="margin-top:12px">
+        Tip: This is the final assignment — ensure the evidence is clear and labeled.
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const MODULE_ID = 2;
+      const ASSIGNMENT_NUMBER = 15;
+      const TOTAL_ASSIGNMENTS = 15;
+      const MAX_MB = 5;
+      document.getElementById('maxMbText').textContent = MAX_MB + ' MB';
+
+      const fileEl = document.getElementById('photoFile');
+      const noteEl = document.getElementById('photoNote');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const statusEl = document.getElementById('status');
+      const previewWrap = document.getElementById('localPreview');
+      const previewImg = document.getElementById('previewImg');
+      const previewName = document.getElementById('previewName');
+      const previewSize = document.getElementById('previewSize');
+      const previewNote = document.getElementById('previewNote');
+      const prevList = document.getElementById('previousUploads');
+      const completedCountEl = document.getElementById('completedCount');
+      const lastScoreEl = document.getElementById('lastScore');
+      const avgScoreEl = document.getElementById('avgScore');
+      const progressText = document.getElementById('progressText');
+      const progressArc = document.getElementById('progressArc');
+
+      function showStatus(msg, isErr){ statusEl.textContent = msg; statusEl.className = isErr ? 'small err' : 'small'; }
+      function clearStatus(){ statusEl.textContent=''; statusEl.className='small'; }
+      function getToken(){ return sessionStorage.getItem('lifesafe_access'); }
+
+      async function apiFetch(path, method='GET', body=null){
+        const headers = {};
+        const token = getToken(); if(token) headers['Authorization'] = 'Bearer ' + token;
+        if(body) headers['Content-Type'] = 'application/json';
+        const opts = { method, headers }; if(body) opts.body = JSON.stringify(body);
+        try {
+          const res = await fetch(window.location.origin + path, opts);
+          const data = await res.json().catch(()=>({ok:false})); return { status: res.status, data };
+        } catch (err) { return { status:0, data:{ok:false, message: err.message || 'Network error'} }; }
+      }
+
+      fileEl.addEventListener('change', function(){
+        clearStatus();
+        const f = fileEl.files && fileEl.files[0];
+        if(!f){ previewWrap.style.display='none'; return; }
+        const mb = f.size / (1024*1024);
+        if(mb > MAX_MB){ showStatus(`File too large (${mb.toFixed(2)} MB). Max ${MAX_MB} MB`, true); previewWrap.style.display='none'; return; }
+        const reader = new FileReader();
+        reader.onload = function(e){
+          previewImg.src = e.target.result;
+          previewName.textContent = f.name;
+          previewSize.textContent = `${(mb).toFixed(2)} MB`;
+          previewNote.textContent = noteEl.value || '';
+          previewWrap.style.display = 'flex';
+        };
+        reader.readAsDataURL(f);
+      });
+
+      clearBtn.addEventListener('click', function(){
+        fileEl.value = '';
+        noteEl.value = '';
+        previewWrap.style.display = 'none';
+        clearStatus();
+        loadProgressAndUploads();
+      });
+
+      uploadBtn.addEventListener('click', async function(){
+        clearStatus();
+        const token = getToken();
+        if(!token){ alert('You must be logged in to upload. Please sign in.'); return; }
+
+        const f = fileEl.files && fileEl.files[0];
+        if(!f){ showStatus('Please select a photo to upload.', true); return; }
+        const mb = f.size / (1024*1024);
+        if(mb > MAX_MB){ showStatus(`File too large (${mb.toFixed(2)} MB). Max ${MAX_MB} MB`, true); return; }
+
+        showStatus('Reading file...');
+        const dataUrl = await new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.onerror = () => reject(new Error('File read error'));
+          r.readAsDataURL(f);
+        }).catch(e => { showStatus(e.message || 'Read error', true); return null; });
+        if(!dataUrl) return;
+
+        const payload = { assignment: ASSIGNMENT_NUMBER, filename: f.name, b64: dataUrl };
+        showStatus('Uploading photo...');
+        const res = await apiFetch(`/api/module/${MODULE_ID}/upload`, 'POST', payload);
+        if(res.status === 200 && res.data && res.data.ok){
+          showStatus('Upload successful ✔');
+          fileEl.value = '';
+          noteEl.value = '';
+          previewWrap.style.display = 'none';
+          await loadProgressAndUploads();
+        } else {
+          const msg = (res.data && (res.data.message || JSON.stringify(res.data))) || 'Upload failed';
+          showStatus(msg, true);
+        }
+      });
+
+      async function loadProgressAndUploads(){
+        const res = await apiFetch(`/api/module/${MODULE_ID}/progress`, 'GET');
+        if(res.status === 401){
+          completedCountEl.textContent = `0 / ${TOTAL_ASSIGNMENTS}`;
+          lastScoreEl.textContent = '—'; avgScoreEl.textContent = '—';
+          progressText.textContent = '0%';
+          prevList.innerHTML = '<div class="small">Sign in to see uploads and progress.</div>';
+          return;
+        }
+        if(res.status !== 200 || !res.data.ok){
+          prevList.innerHTML = '<div class="small">Unable to load progress.</div>';
+          return;
+        }
+
+        const p = res.data;
+        const done = (p.completed || []).length;
+        completedCountEl.textContent = `${done} / ${TOTAL_ASSIGNMENTS}`;
+        lastScoreEl.textContent = (p.scores && p.scores[ASSIGNMENT_NUMBER] !== undefined) ? `${p.scores[ASSIGNMENT_NUMBER]} / 10` : '—';
+        const arr = Object.values(p.scores || {}).filter(v => typeof v === 'number');
+        avgScoreEl.textContent = arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) + ` / 10` : '—';
+
+        const pct = Math.round((done / TOTAL_ASSIGNMENTS) * 100);
+        progressText.textContent = pct + '%';
+        const circumference = 100;
+        const dash = Math.round((pct/100) * circumference);
+        progressArc.setAttribute('stroke-dasharray', `${dash} ${circumference - dash}`);
+
+        prevList.innerHTML = '';
+        const uploads = (p.uploads || []).filter(u => u.assignment == ASSIGNMENT_NUMBER);
+        if(uploads.length === 0){
+          prevList.innerHTML = '<div class="small">No uploads yet for this assignment.</div>';
+        } else {
+          uploads.slice().reverse().forEach(u => {
+            const item = document.createElement('div');
+            item.className = 'upload-item';
+            const meta = document.createElement('div');
+            meta.style.flex = '1';
+            meta.innerHTML = `<div style="font-weight:600">${escapeHtml(u.filename || 'upload')}</div>
+                              <div class="small" style="margin-top:6px">Upload ID: ${escapeHtml(u.upload_id || u.uploadId || '—')}</div>`;
+            item.appendChild(meta);
+            prevList.appendChild(item);
+          });
+        }
+      }
+
+      function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' })[c]); }
+
+      loadProgressAndUploads();
+    })();
+  </script>
+</body>
+</html>

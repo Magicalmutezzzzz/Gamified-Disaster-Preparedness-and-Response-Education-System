@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 2 — Assignment 1: Earthquake Basics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    :root{
+      --bg:#07102a; --card:#0f1724; --muted:#cfe5ff; --accent:#ff6b35;
+      --success:#22c55e; --danger:#ef4444; --glass:rgba(255,255,255,0.03);
+      --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg), #021024);color:#e6f0ff;}
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:20px;display:grid;
+      grid-template-columns:1fr 380px;gap:20px;}
+    .left,.right{background:var(--card);border-radius:12px;padding:18px;
+      border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{margin:0;font-size:20px;color:var(--accent)} .sub{color:var(--muted);opacity:.9;font-size:13px}
+    .video-wrap{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+      padding:12px;border-radius:10px;box-shadow:0 8px 24px rgba(2,6,23,0.6)}
+    .video-embed{width:100%;height:0;padding-bottom:56.25%;position:relative;border-radius:8px;overflow:hidden}
+    .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+    .meta{margin-top:12px;background:var(--glass);padding:12px;border-radius:8px}
+    .meta h4{margin:0 0 8px 0;font-size:15px} .meta p{margin:0;font-size:13px;color:#d6e9ff}
+    form.quiz{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+    .question{background:rgba(255,255,255,0.02);padding:12px;border-radius:8px}
+    .question h4{margin:0 0 8px 0;font-size:14px}
+    .opt{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer}
+    .opt input{transform:scale(1.05)} .opt:hover{background:rgba(255,255,255,0.02)}
+    .actions{display:flex;gap:10px;margin-top:10px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .note{font-size:13px;color:var(--muted)}
+    .card-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-ring{width:200px;height:200px;margin:10px auto}
+    .stats{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .stat{display:flex;justify-content:space-between;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
+    .correct{border-left:6px solid var(--success);background:rgba(34,197,94,0.03)}
+    .incorrect{border-left:6px solid var(--danger);background:rgba(239,68,68,0.03)}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6)}
+    .modal-inner{background:var(--card);padding:20px;border-radius:12px;width:380px;text-align:center}
+    .modal-inner h3{margin:0 0 8px 0;color:var(--accent)} .close-btn{background:#fff;color:#000;border-radius:8px;padding:8px 12px;cursor:pointer}
+    @media(max-width:980px){.wrap{grid-template-columns:1fr}.right{order:2}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <header>
+        <div><h1>Module 2 • Earthquake</h1><div class="sub">Assignment 1 — Earthquake Basics</div></div>
+        <div style="text-align:right">
+          <div class="sub">Est. time: <strong>8–10 min</strong></div>
+          <a class="btn ghost" href="module2.html">Back to Module</a>
+        </div>
+      </header>
+
+      <div class="video-wrap">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/Ag26q5JbRR8"
+            title="Earthquake Basics" allowfullscreen></iframe>
+        </div>
+        <div class="meta">
+          <h4>Video Description</h4>
+          <p>This video introduces earthquakes: how tectonic plates shift, the release of energy, and the destructive impacts. It explains the epicenter, seismic waves, Richter scale, and practical safety rules like Drop, Cover, Hold On.</p>
+        </div>
+      </div>
+
+      <form class="quiz" id="quizForm"></form>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <div class="note">Each question: <strong>1 mark</strong>. Total: 10 marks.</div>
+        <div class="actions">
+          <button class="btn" id="submitBtn" type="button">Submit Answers</button>
+          <button class="btn ghost" id="clearBtn" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="right">
+      <div class="card-title">
+        <div><strong style="color:var(--muted)">Progress</strong><div style="font-size:12px">Module 2</div></div>
+        <div style="font-size:12px">Assignment 1</div>
+      </div>
+      <div style="text-align:center">
+        <svg viewBox="0 0 36 36" class="progress-ring" id="progressSvg">
+          <path d="M18 2.0845a15.9 15.9 0 0 1 0 31.831a15.9 15.9 0 0 1 0 -31.831"
+            fill="none" stroke="#374151" stroke-width="3.5"/>
+          <path id="progressArc" d="M18 2.0845a15.9 15.9 0 0 1 0 31.831a15.9 15.9 0 0 1 0 -31.831"
+            fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="0 100"/>
+          <text x="18" y="20.5" font-size="6" text-anchor="middle" fill="#fff" id="progressText">0%</text>
+        </svg>
+      </div>
+      <div class="stats">
+        <div class="stat"><div>Completed Assignments</div><div id="completedCount">0 / 15</div></div>
+        <div class="stat"><div>Your Score</div><div id="lastScore">—</div></div>
+        <div class="stat"><div>Module Avg.</div><div id="avgScore">—</div></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal" id="resultModal">
+    <div class="modal-inner">
+      <h3>Result</h3><p id="modalMsg"></p>
+      <button class="close-btn" id="modalOk">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      {q:"What is the best definition of an earthquake?",options:["The sudden shaking of the ground caused by the movement of rock beneath the Earth's surface.","The heat from the sun warming the Earth’s crust.","A giant ocean wave caused by strong winds.","A type of eruption that shoots magma and ash out of a mountain."],a:0},
+      {q:"What are the large pieces of the Earth’s outer surface that move and scrape against each other to cause earthquakes called?",options:["Continents","Fault blocks","Tectonic plates","Mantle pieces"],a:2},
+      {q:"Where does the energy that causes the ground to shake during an earthquake originally come from?",options:["Friction from the moon’s gravity pulling on the crust.","Strong winds pushing the ground in a specific direction.","The heat from deep inside the Earth's core heating the water.","The sudden release of built-up stress as plates scrape past each other."],a:3},
+      {q:"What is the name for the exact spot on the Earth's surface directly above where an earthquake starts?",options:["Magnitude point","Epicenter","Focus","Tectonic center"],a:1},
+      {q:"What instrument do scientists use to detect and record the size and strength of an earthquake?",options:["Telescope","Thermometer","Microscope","Seismograph"],a:3},
+      {q:"What is the common scale used by scientists to report the magnitude (strength) of an earthquake?",options:["Celsius scale","Meter scale","Decibel scale","Richter scale"],a:3},
+      {q:"What do scientists call the waves of energy that travel through the Earth during an earthquake, causing the ground to shake?",options:["Radio waves","Seismic waves","Sound waves","Ocean waves"],a:1},
+      {q:"What deadly wave can an underwater earthquake sometimes create in the ocean?",options:["Geyser","Tidal wave","Tsunami","Hurricane"],a:2},
+      {q:"What is the most important safety rule you should follow if you are inside a building when an earthquake begins?",options:["Drop, Cover, and Hold On.","Hide in a closet or bathroom stall.","Run outside as fast as you can to get away from the building.","Stand in a doorway until the shaking stops."],a:0},
+      {q:"Is it true or false that earthquakes are powerful enough to cause cracks and permanent changes to the surface of the Earth?",options:["True","False"],a:0}
+    ];
+
+    const MODULE_ID = 2, ASSIGNMENT_NUMBER = 1, TOTAL_ASSIGNMENTS = 15;
+    const quizForm=document.getElementById('quizForm'),submitBtn=document.getElementById('submitBtn'),
+      clearBtn=document.getElementById('clearBtn'),resultModal=document.getElementById('resultModal'),
+      modalMsg=document.getElementById('modalMsg'),modalOk=document.getElementById('modalOk'),
+      completedCountEl=document.getElementById('completedCount'),lastScoreEl=document.getElementById('lastScore'),
+      avgScoreEl=document.getElementById('avgScore'),progressText=document.getElementById('progressText'),
+      progressArc=document.getElementById('progressArc');
+
+    function renderQuestions(){QUESTIONS.forEach((item,idx)=>{const qDiv=document.createElement('div');
+      qDiv.className='question';qDiv.innerHTML=`<h4>Q${idx+1}. ${item.q}</h4>`;
+      item.options.forEach((op,oi)=>{const label=document.createElement('label');label.className='opt';
+        label.innerHTML=`<input type="radio" name="q${idx}" value="${oi}"/> ${op}`;qDiv.appendChild(label);});
+      quizForm.appendChild(qDiv);});}
+    function validateAnswers(){for(let i=0;i<QUESTIONS.length;i++){const els=document.getElementsByName('q'+i);
+      if(![...els].some(e=>e.checked))return false;}return true;}
+    function getToken(){return sessionStorage.getItem('lifesafe_access');}
+    async function apiFetch(path,opts={}){const token=getToken();const headers={'Content-Type':'application/json'};
+      if(token)headers['Authorization']='Bearer '+token;
+      const res=await fetch(window.location.origin+path,{...opts,headers});
+      return {status:res.status,data:await res.json()};}
+    async function loadProgress(){const r=await apiFetch(`/api/module/${MODULE_ID}/progress`);return r.data;}
+    async function saveProgress(state){await apiFetch(`/api/module/${MODULE_ID}/progress`,{method:'POST',body:JSON.stringify(state)});}
+    async function updateRightPanel(){const p=await loadProgress();const done=(p.completed||[]).length;
+      completedCountEl.textContent=`${done} / ${TOTAL_ASSIGNMENTS}`;const s=p.scores?.[ASSIGNMENT_NUMBER];
+      lastScoreEl.textContent=s!==undefined?`${s} / ${QUESTIONS.length}`:'—';
+      const vals=Object.values(p.scores||{});const avg=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';
+      avgScoreEl.textContent=avg==='—'?'—':`${avg} / ${QUESTIONS.length}`;
+      const pct=Math.round((done/TOTAL_ASSIGNMENTS)*100);progressText.textContent=pct+'%';
+      progressArc.setAttribute('stroke-dasharray',`${pct} ${100-pct}`);}
+    async function gradeAndSave(){let score=0;QUESTIONS.forEach((item,idx)=>{const ans=document.querySelector(`input[name="q${idx}"]:checked`);
+      const chosen=ans?parseInt(ans.value):null;const qDiv=ans?ans.closest('.question'):quizForm.children[idx];
+      if(chosen===item.a){score++;qDiv.classList.add('correct');}else{qDiv.classList.add('incorrect');}});
+      const state=await loadProgress();if(!state.completed.includes(ASSIGNMENT_NUMBER))state.completed.push(ASSIGNMENT_NUMBER);
+      state.scores[ASSIGNMENT_NUMBER]=score;await saveProgress(state);
+      modalMsg.textContent=`You scored ${score} / ${QUESTIONS.length}`;resultModal.style.display='flex';updateRightPanel();
+      submitBtn.disabled=true;submitBtn.textContent='Submitted ✓';}
+    submitBtn.onclick=()=>{if(validateAnswers())gradeAndSave();else alert('Answer all questions');};
+    clearBtn.onclick=()=>{document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+      document.querySelectorAll('.question').forEach(q=>q.classList.remove('correct','incorrect'));
+      submitBtn.disabled=false;submitBtn.textContent='Submit Answers';};
+    modalOk.onclick=()=>{resultModal.style.display='none';window.location.href='module2.html';};
+    renderQuestions();updateRightPanel();
+  </script>
+</body>
+</html>

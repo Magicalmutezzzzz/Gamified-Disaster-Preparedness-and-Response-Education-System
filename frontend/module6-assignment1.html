@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 6 — Assignment 1: Understanding Crowd Dynamics and Dangers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+    :root{
+      --bg:#07102a;
+      --card:#0f1724;
+      --muted:#cfe5ff;
+      --accent:#ff6b35;
+      --success:#22c55e;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03);
+      --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg), #021024);
+      color:#e6f0ff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{
+      max-width:var(--maxw);
+      margin:28px auto;
+      padding:20px;
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap:20px;
+    }
+    .left, .right{background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{margin:0;font-size:20px;color:var(--accent)}
+    .sub{color:var(--muted);opacity:0.9;font-size:13px}
+
+    /* Video area */
+    .video-wrap{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:10px;box-shadow:0 8px 24px rgba(2,6,23,0.6)}
+    .video-embed{width:100%;height:0;padding-bottom:56.25%;position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+    .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+
+    /* Quiz */
+    form.quiz{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+    .question{background:rgba(255,255,255,0.02);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
+    .question h4{margin:0 0 8px 0;font-size:14px}
+    .options{display:grid;gap:8px}
+    .opt{
+      display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);
+      cursor:pointer;background:transparent;
+    }
+    .opt input{transform:scale(1.05)}
+    .opt:hover{background:rgba(255,255,255,0.02)}
+    .actions{display:flex;gap:10px;align-items:center;margin-top:10px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .note{font-size:13px;color:var(--muted)}
+
+    /* Right panel */
+    .card-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .progress-ring{width:200px;height:200px;margin:10px auto}
+    .stats{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
+
+    /* result highlight */
+    .correct{border-left:6px solid var(--success);background:rgba(34,197,94,0.03)}
+    .incorrect{border-left:6px solid var(--danger);background:rgba(239,68,68,0.03)}
+
+    /* modal */
+    .modal{
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(rgba(2,6,23,0.5),rgba(2,6,23,0.6));
+    }
+    .modal-inner{background:var(--card);padding:20px;border-radius:12px;width:380px;border:1px solid rgba(255,255,255,0.04);text-align:center}
+    .modal-inner h3{margin:0 0 8px 0;color:var(--accent)}
+    .modal-inner p{margin:0 0 12px 0;color:var(--muted)}
+    .close-btn{background:#fff;color:#000;border-radius:8px;padding:8px 12px;border:none;cursor:pointer}
+
+    @media (max-width:980px){
+      .wrap{grid-template-columns:1fr}
+      .right{order:2}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <header>
+        <div>
+          <h1>Module 6 • Crowd Safety</h1>
+          <div class="sub">Assignment 1 — Understanding Crowd Dynamics and Dangers</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sub">Est. time: <strong>6–8 min</strong></div>
+          <a class="btn ghost" href="module6.html" style="margin-top:8px;display:inline-block">Back to Module</a>
+        </div>
+      </header>
+
+      <div class="video-wrap">
+        <div class="video-embed" aria-hidden="false">
+          <!-- provided video -->
+          <iframe src="https://www.youtube.com/embed/ldOprmqSt7o"
+            title="Understanding Crowd Dynamics and Dangers" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+
+        <div class="meta" role="region" aria-labelledby="descTitle" style="margin-top:12px;background:var(--glass);padding:12px;border-radius:8px">
+          <h4 id="descTitle" style="margin:0 0 8px 0;font-size:15px">Video Description</h4>
+          <p style="margin:0;font-size:13px;color:#d6e9ff;line-height:1.4">
+            This lesson explains crowd crush mechanics, key danger signs, and life-saving strategies (boxer stance, breathing, escape routes). Watch carefully — quiz checks core definitions and survival actions.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <form class="quiz" id="quizForm" aria-label="Quiz for Assignment 1"></form>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <div class="note">Each question: <strong>1 mark</strong>. Total: 10 marks.</div>
+        <div class="actions">
+          <button class="btn" id="submitBtn" type="button">Submit Answers</button>
+          <button class="btn ghost" id="clearBtn" type="button">Reset Answers</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="right" aria-label="Progress & Stats">
+      <div class="card-title">
+        <div><strong style="color:var(--muted)">Progress</strong><div style="font-size:12px;color:#bcd8ff">Module 6 — Crowd Safety</div></div>
+        <div style="font-size:12px;color:var(--muted)">Assignment 1</div>
+      </div>
+
+      <div style="text-align:center">
+        <svg viewBox="0 0 36 36" class="progress-ring" id="progressSvg" width="200" height="200" aria-hidden>
+          <path d="M18 2.0845
+            a 15.9155 15.9155 0 0 1 0 31.831
+            a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none" stroke="#374151" stroke-width="3.5"></path>
+          <path id="progressArc" d="M18 2.0845
+            a 15.9155 15.9155 0 0 1 0 31.831
+            a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="0 100"></path>
+          <text x="18" y="20.5" font-size="6" text-anchor="middle" fill="#fff" id="progressText">0%</text>
+        </svg>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div style="font-size:14px">Completed Assignments</div><div id="completedCount">0 / 15</div></div>
+        <div class="stat"><div style="font-size:14px">Your score (this assignment)</div><div id="lastScore">—</div></div>
+        <div class="stat"><div style="font-size:14px">Module Avg. (so far)</div><div id="avgScore">—</div></div>
+      </div>
+
+      <div style="margin-top:12px;font-size:13px;color:var(--muted)">
+        Tip: Pause the video and memorise the 'boxer stance' and breathing technique — they save lives in dense crowds.
+      </div>
+    </aside>
+  </div>
+
+  <!-- modal -->
+  <div class="modal" id="resultModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-inner" role="document">
+      <h3>Result</h3>
+      <p id="modalMsg">You scored X / 10</p>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button class="close-btn" id="modalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /***** QUESTIONS (Module 6 — Assignment 1) *****/
+    const QUESTIONS = [
+      {
+        q: "What is the minimum crowd density, in people per square meter, that is classified as a dangerous \"high-density crowd\" according to the video?",
+        options: ["Four or more people per square meter", "Six or more people per square meter", "Three or more people per square meter", "Ten or more people per square meter"],
+        a: 0
+      },
+      {
+        q: "What is the primary cause of death when people are killed in a \"crowd crush\" event?",
+        options: ["Trampling by others running over them in a panic", "Suffocation (Asphyxia) from being squeezed so tightly that the lungs cannot inflate", "Head injuries from falling and striking the ground", "Cardiac arrest due to extreme stress and exhaustion"],
+        a: 1
+      },
+      {
+        q: "In a high-density crowd, individuals lose their ability to move on their own, and the crowd begins to behave a lot like what substance?",
+        options: ["Sand", "A gas", "A solid mass", "A fluid"],
+        a: 3
+      },
+      {
+        q: "What incident is described as \"Progressive crowd collapse\"?",
+        options: ["People falling over one another in a domino effect after one person falls, leading to fatal crushing.", "A crowd moving forward and then suddenly backing up due to a bottleneck.", "People losing their ability to breathe while standing up due to pressure.", "A spontaneous, widespread panic where everyone runs for an exit simultaneously."],
+        a: 0
+      },
+      {
+        q: "According to the crowd researchers in the video, why are 'mass panics and stampedes' often an inaccurate explanation for deaths in crowd crushes?",
+        options: ["Stampedes are rare and mostly occur in small, unmanaged crowds.", "Most crowd crush deaths happen when the crowd is perfectly calm.", "If there is enough room to run roughshod over people, there is likely enough room for those people to get out of the way.", "The people doing the trampling are typically mentally impaired by loud noises."],
+        a: 2
+      },
+      {
+        q: "What is the suggested immediate action if you find yourself in a surging crowd?",
+        options: ["Stop, turn around, and loudly call for help from the event organizers.", "Follow the crowd movement but continuously move to the side as much as possible.", "Push back against the direction of the surge to create space.", "Immediately fall to the ground and curl into a fetal position."],
+        a: 1
+      },
+      {
+        q: "According to the video, what is one of the first physical signs an individual loses control in a high-density crowd, after losing the ability to move freely?",
+        options: ["Losing the ability to move their arms from their sides.", "Losing the ability to stand upright without assistance.", "Losing the ability to hear warning calls.", "Losing the ability to keep their head upright."],
+        a: 3
+      },
+      {
+        q: "What key difference between humans and ants is cited as the reason why information (like a warning) often fails to spread effectively through a dense crowd?",
+        options: ["Ants move at a slower, more predictable pace than panicking humans.", "Humans rely on sight, while ants rely on touch and pheromones.", "Humans panic and ignore warnings, while ants remain focused on the collective goal.", "Ants are a collective organism that transmits information through the crowd, while humans do not."],
+        a: 1
+      },
+      {
+        q: "What specific technology and behavioral sign are crowd researchers using to predict and prevent fatal high-density crowd situations?",
+        options: ["Wristbands worn by attendees that monitor heart rates and report panic.", "AI-fed video analysis looking for people swaying from side to side.", "Sound sensors listening for a sudden increase in screaming or yelling.", "Infrared cameras to measure overall crowd temperature for 'body heat' increases."],
+        a: 1
+      },
+      {
+        q: "What does the video suggest is the single best action an individual can take to ensure their safety from a crowd crush?",
+        options: ["Bring a whistle or air horn to communicate warnings to others.", "Arm yourself with survival knowledge, like the boxer stance.", "Get out of the crowd as soon as you realize it is becoming high-density and dangerous.", "Enter the crowd early and secure a position near the front of the stage or attraction."],
+        a: 2
+      }
+    ];
+
+    // CONFIG: module & assignment numbers
+    const MODULE_ID = 6;
+    const ASSIGNMENT_NUMBER = 1;
+    const TOTAL_ASSIGNMENTS = 15;
+
+    // DOM refs
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resultModal = document.getElementById('resultModal');
+    const modalMsg = document.getElementById('modalMsg');
+    const modalOk = document.getElementById('modalOk');
+    const completedCountEl = document.getElementById('completedCount');
+    const lastScoreEl = document.getElementById('lastScore');
+    const avgScoreEl = document.getElementById('avgScore');
+    const progressText = document.getElementById('progressText');
+    const progressArc = document.getElementById('progressArc');
+
+    // render questions
+    function renderQuestions(){
+      QUESTIONS.forEach((item, idx) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        qDiv.innerHTML = `<h4>Q${idx+1}. ${item.q}</h4><div class="options" role="radiogroup" aria-labelledby="q${idx+1}"></div>`;
+        const opts = qDiv.querySelector('.options');
+        item.options.forEach((op, oi) => {
+          const id = `q${idx}_opt${oi}`;
+          const label = document.createElement('label');
+          label.className = 'opt';
+          label.innerHTML = `<input type="radio" name="q${idx}" id="${id}" value="${oi}" /> <span style="font-size:14px">${op}</span>`;
+          opts.appendChild(label);
+        });
+        quizForm.appendChild(qDiv);
+      });
+    }
+
+    // helpers: auth token from sessionStorage
+    function getToken(){
+      return sessionStorage.getItem('lifesafe_access');
+    }
+
+    async function apiFetch(path, method='GET', body=null) {
+      const headers = {'Content-Type':'application/json'};
+      const token = getToken();
+      if(token) headers['Authorization'] = 'Bearer ' + token;
+      const opts = { method, headers };
+      if(body) opts.body = JSON.stringify(body);
+      try {
+        const res = await fetch(window.location.origin + path, opts);
+        const data = await res.json().catch(()=>({ok:false, message:'Invalid JSON from server'}));
+        return { status: res.status, data };
+      } catch (err) {
+        return { status: 0, data: { ok:false, message: 'Network error: ' + err.message } };
+      }
+    }
+
+    async function loadProgress(){
+      const res = await apiFetch(`/api/module/${MODULE_ID}/progress`, 'GET');
+      if(res.status === 401){
+        // Not logged in
+        // keep UI usable but don't crash
+        return { completed: [], scores: {} };
+      }
+      if(res.status !== 200 || !res.data.ok){
+        console.warn('Could not load progress', res);
+        return { completed: [], scores: {} };
+      }
+      return res.data;
+    }
+
+    async function saveProgress(state){
+      const res = await apiFetch(`/api/module/${MODULE_ID}/progress`, 'POST', state);
+      if(res.status === 401){
+        alert('You must be logged in to save progress. Please sign in.');
+      }
+      return res;
+    }
+
+    async function updateRightPanel(){
+      const p = await loadProgress();
+      const done = (p.completed || []).length;
+      completedCountEl.textContent = `${done} / ${TOTAL_ASSIGNMENTS}`;
+      const lastScore = (p.scores && p.scores[ASSIGNMENT_NUMBER] !== undefined) ? p.scores[ASSIGNMENT_NUMBER] : '—';
+      lastScoreEl.textContent = lastScore === '—' ? '—' : `${lastScore} / ${QUESTIONS.length}`;
+      const scoresArr = Object.values(p.scores || {}).filter(v => typeof v === 'number');
+      const avg = scoresArr.length ? (scoresArr.reduce((a,b)=>a+b,0)/scoresArr.length).toFixed(1) : '—';
+      avgScoreEl.textContent = avg === '—' ? '—' : `${avg} / ${QUESTIONS.length}`;
+
+      // progress ring - dash array uses simple percentage mapping
+      const pct = Math.round((done / TOTAL_ASSIGNMENTS) * 100);
+      progressText.textContent = pct + '%';
+      const circumference = 100;
+      const dash = Math.round((pct/100) * circumference);
+      progressArc.setAttribute('stroke-dasharray', `${dash} ${circumference - dash}`);
+    }
+
+    // validate answers
+    function validateAnswers(){
+      for(let i=0;i<QUESTIONS.length;i++){
+        const els = document.getElementsByName('q'+i);
+        let answered = false;
+        for(const e of els){ if(e.checked){ answered = true; break; } }
+        if(!answered) return false;
+      }
+      return true;
+    }
+
+    // compute score and save to backend
+    async function gradeAndSave(){
+      let score = 0;
+      QUESTIONS.forEach((item, idx) => {
+        const ans = document.querySelector(`input[name="q${idx}"]:checked`);
+        const chosen = ans ? parseInt(ans.value,10) : null;
+        const qDiv = ans ? ans.closest('.question') : document.getElementsByClassName('question')[idx];
+        if(chosen === item.a){
+          score += 1;
+          if(qDiv) { qDiv.classList.remove('incorrect'); qDiv.classList.add('correct'); }
+        } else {
+          if(qDiv) { qDiv.classList.remove('correct'); qDiv.classList.add('incorrect'); }
+        }
+      });
+
+      // Load existing progress, update then POST
+      const state = await loadProgress();
+      state.completed = state.completed || [];
+      state.scores = state.scores || {};
+
+      if(!state.completed.includes(ASSIGNMENT_NUMBER)){
+        state.completed.push(ASSIGNMENT_NUMBER);
+      }
+      state.scores[ASSIGNMENT_NUMBER] = score;
+
+      await saveProgress({ completed: state.completed, scores: state.scores });
+
+      // show modal
+      modalMsg.textContent = `You scored ${score} / ${QUESTIONS.length}`;
+      resultModal.style.display = 'flex';
+      resultModal.setAttribute('aria-hidden','false');
+      updateRightPanel();
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitted ✓';
+    }
+
+    // event handlers
+    submitBtn.addEventListener('click', async function(){
+      // ensure user is authenticated before allowing submit
+      const token = getToken();
+      if(!token){
+        alert('Please login to submit answers.');
+        return;
+      }
+      if(!validateAnswers()){
+        alert('Please answer all questions before submitting.');
+        return;
+      }
+      await gradeAndSave();
+    });
+
+    clearBtn.addEventListener('click', function(){
+      // clear all radios and highlights
+      document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+      document.querySelectorAll('.question').forEach(q=>{q.classList.remove('correct','incorrect')});
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Answers';
+    });
+
+    modalOk.addEventListener('click', function(){
+      resultModal.style.display = 'none';
+      resultModal.setAttribute('aria-hidden','true');
+      // go back to module overview (or stay if you prefer)
+      window.location.href = 'module6.html';
+    });
+
+    // init
+    (async function init(){
+      renderQuestions();
+      await updateRightPanel();
+    })();
+  </script>
+</body>
+</html>
