@@ -38,7 +38,7 @@ MONGO_URI = os.environ.get("MONGO_URI")
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "*")
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://ocalhost:3000")
 ALLOW_INSECURE_GOOGLE = os.environ.get("ALLOW_INSECURE_GOOGLE", "0") == "1"
 
 if not MONGO_URI:
@@ -47,16 +47,15 @@ if not JWT_SECRET_KEY:
     raise RuntimeError("JWT_SECRET_KEY is required in environment")
 if not ADMIN_SECRET:
     raise RuntimeError("ADMIN_SECRET is required in environment")
+if not GOOGLE_CLIENT_ID and not ALLOW_INSECURE_GOOGLE:
+    raise RuntimeError("GOOGLE_CLIENT_ID is required unless ALLOW_INSECURE_GOOGLE=1 (dev only).")
 
 # ---------------------------
 # Flask app
 # ---------------------------
-app = Flask(__name__, static_folder="frontend", static_url_path="/")
-# allow wildcard or single origin
-if FRONTEND_ORIGIN == "*" or FRONTEND_ORIGIN == "":
-    CORS(app)
-else:
-    CORS(app, resources={r"/*": {"origins": FRONTEND_ORIGIN}})
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), "..", "frontend"), static_url_path="")
+CORS(app, origins=[FRONTEND_ORIGIN])   
+# allow frontend only
 
 app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=6)
