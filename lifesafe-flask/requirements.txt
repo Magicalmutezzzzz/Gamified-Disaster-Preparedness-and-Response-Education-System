@@ -4,7 +4,8 @@ flask-jwt-extended==4.4.4
 pymongo==4.5.0
 passlib==1.7.4
 python-dotenv==1.0.0
-gunicorn==20.1.0
-google-auth==2.22.0          # optional; include only if using Google sign-in verification
+gunicorn>=21.2.0
+google-auth==2.22.0
 requests
 setuptools>=68.0.0
+wheel
