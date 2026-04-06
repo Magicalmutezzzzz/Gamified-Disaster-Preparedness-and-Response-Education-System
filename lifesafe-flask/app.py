@@ -5,7 +5,6 @@ Single-file Flask backend for Gamified Disaster Preparedness & Response Educatio
 
 Note: set environment variables (MONGO_URI, JWT_SECRET_KEY, ADMIN_SECRET, etc.)
 """
-import pkg_resources
 import os
 import base64
 import binascii
