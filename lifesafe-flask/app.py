@@ -38,7 +38,7 @@ MONGO_URI = os.environ.get("MONGO_URI")
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://ocalhost:3000")
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000")
 ALLOW_INSECURE_GOOGLE = os.environ.get("ALLOW_INSECURE_GOOGLE", "0") == "1"
 
 if not MONGO_URI:
